@@ -37,13 +37,15 @@
           <div class="ui large secondary inverted pointing menu">
             <!-- <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">Home</a><a class="item">Work</a><a class="item">Company</a><a class="item">Careers</a> -->
             <div class="right item">
-              <i class="child icon"></i>
-            <a class="ui button">user 1</a>
+            <a class="ui image label">
+              <img src="../../static/images/templates/semantic-ui/avatar/user_bb.jpg">
+              User1
+            </a>
             </div>
           </div>
         </div>
         <div class="ui text container">
-          <h1 class="ui inverted header">
+          <!-- <h1 class="ui inverted header">
             BB Music Service
           </h1>
           <h2>
@@ -51,7 +53,15 @@
           </h2>
           <div class="ui inverted button">
             Join Now!<i class="right arrow icon"></i>
-          </div>
+          </div> -->
+          <form class="ui fluid form">
+            <div class="field">
+              <input type="text" placeholder="search">
+              <div class="ui pointing label">
+                Please enter artist name or song title 
+              </div>
+            </div>
+          </form>
         </div>
       </div>
       <div class="ui vertical stripe segment">
@@ -183,6 +193,12 @@
       }
       .masthead .ui.menu .ui.button {
         margin-left: 0.5em;
+      }
+
+      .masthead form.ui.fluid.form{
+
+        margin-top: 20em;
+        margin-bottom: 0em;
       }
       .masthead h1.ui.header {
         /*position: fixed;
