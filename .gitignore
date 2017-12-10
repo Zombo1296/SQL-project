@@ -1,4 +1,4 @@
-/.idea/*
-/Lib/*
-/Scripts/*
-/tcl/*
+/py/.idea/*
+/py/Lib/*
+/py/Scripts/*
+/py/tcl/*
