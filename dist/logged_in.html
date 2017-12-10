@@ -35,11 +35,11 @@
 
     <!--Page Contents-->
     <div class="pusher">
-      <div class="ui inverted vertical masthead center aligned segment">
+      <div class="ui vertical masthead aligned segment ">
         
         <!-- top bar menu -->
         <div class="ui container">
-          <div class="ui large secondary inverted pointing menu">
+          <div class="ui large secondary pointing menu">
             <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
 
             <div class="right item">
@@ -59,7 +59,7 @@
             <!-- item1 -->
             <div class="item">
               
-              <div class="ui small image">
+              <div class="ui tiny image">
                 <img src="./image/album_imgs/lorde.jpg">
               </div>
 
@@ -78,7 +78,7 @@
             <!-- item2 -->
             <div class="item">
               
-              <div class="ui small image">
+              <div class="ui tiny image">
                 <img src="./image/album_imgs/lorde.jpg">
               </div>
 
@@ -97,21 +97,24 @@
       </div>
       <!-- user info -->
 
-      <!-- search -->
-      <div class="ui container">
-        <form class="item">
-          <div class="ui search">
-            <div class="ui icon input">
-              <input class="prompt" type="text" placeholder="Search artist name or song title...">
-              <i class="search icon"></i>
-            </div>
-          <div class="results"></div>
-        </form>
-      </div>
-      <!-- search -->
+    </div> <!-- inverted vertical masthead center aligned segment -->
+    
+    <!-- search -->
+    <div class="ui container center aligned">
+      <form class="item">
+        <div class="ui search">
+          <div class="ui icon input">
+            <input class="prompt" type="text" placeholder="Search artist name or song title...">
+            <i class="search icon"></i>
+          </div>
+        <div class="results"></div>
+      </form>
+    </div><!-- search -->
 
-    </div>
+
   </div> <!-- pusher -->
+
+
 
       
       
@@ -147,6 +150,7 @@
         </div>
       </div>
     </div>
+    <script src="./semantic-ui/semantic.min.js"></script>
     <style type="text/css">
       .hidden.menu {
         display: none;
@@ -155,7 +159,8 @@
       .masthead.segment {
         min-height: 900px;
         padding: 1em 0em;
-        background-image: url('../../static/images/templates/semantic-ui/background.png') !important;
+        
+        /*background-image: url('./image/background.png') !important;*/
         background-size: cover !important;
       }
 
