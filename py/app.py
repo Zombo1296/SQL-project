@@ -21,6 +21,12 @@ def users():
     rv = cur.fetchall()
     return str(rv)
 
+@app.route('/me/')
+def me():
+    return app.send_static_file('logged_in.html')
+
+
+
 
 
 if __name__ == '__main__':
