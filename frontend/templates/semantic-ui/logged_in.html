@@ -6,7 +6,7 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport" />
     <meta content="Semantic-UI-Forest, collection of design, themes and templates for Semantic-UI." name="description" />
     <meta content="Semantic-UI, Theme, Design, Template" name="keywords" />
-    <meta content="PPType" name="Fan Bu, Bohan Zhang" />  <!-- what's this --> 
+    <meta content="user" name="Fan Bu, Bohan Zhang" />  <!-- what's this --> 
     <meta content="#ffffff" name="theme-color" />
     <title>loged in</title>
     <link href="../../static/dist/semantic-ui/semantic.min.css" rel="stylesheet" type="text/css" />
@@ -15,135 +15,107 @@
     <script src="../../static/dist/jquery/jquery.min.js"></script>
   </head>
   <body>
+    <!-- hidden rolling menu -->
     <div class="ui large top fixed hidden menu">
       <div class="ui container">
-        <!-- <a class="active item">Home</a><a class="item">Work</a><a class="item">Company</a><a class="item">Careers</a> -->
-        <div class="right menu">
-          <div class="item">
-            <i class="child icon"></i>
-            <a class="ui button">user 1</a>
-          </div>
+        <a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
+        <div class="right item">
+            <a class="ui label violet">
+              <img class="ui right spaced avatar image" src="../../static/images/templates/semantic-ui/avatar/user_bb.jpg">
+              User1
+            </a>
         </div>
       </div>
     </div>
+
     <!--Sidebar Menu-->
-    <!-- <div class="ui vertical inverted sidebar menu">
-      <a class="active item">Home</a><a class="item">Work</a><a class="item">Company</a><a class="item">Careers</a><a class="item">Login</a><a class="item">Signup</a>
-    </div> -->
+    <div class="ui vertical inverted sidebar menu">
+      <a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
+    </div>
+
     <!--Page Contents-->
     <div class="pusher">
       <div class="ui inverted vertical masthead center aligned segment">
+        
+        <!-- top bar menu -->
         <div class="ui container">
           <div class="ui large secondary inverted pointing menu">
-            <!-- <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">Home</a><a class="item">Work</a><a class="item">Company</a><a class="item">Careers</a> -->
+            <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
+
             <div class="right item">
-            <a class="ui image label">
-              <img src="../../static/images/templates/semantic-ui/avatar/user_bb.jpg">
-              User1
-            </a>
+              <a class="ui label violet">
+                <img class="ui right spaced avatar image" src="../../static/images/templates/semantic-ui/avatar/user_bb.jpg">
+                User1
+              </a>
             </div>
           </div>
         </div>
-        <div class="ui text container">
-          <!-- <h1 class="ui inverted header">
-            BB Music Service
-          </h1>
-          <h2>
-            Listen to whatever you want when you want to.
-          </h2>
-          <div class="ui inverted button">
-            Join Now!<i class="right arrow icon"></i>
-          </div> -->
-          <form class="ui fluid form">
-            <div class="field">
-              <input type="text" placeholder="search">
-              <div class="ui pointing label">
-                Please enter artist name or song title 
+        <!-- top bar menu -->
+        
+        <!-- user info -->
+        <div class="ui container">
+          <h1>Liked tracks</h1>
+          <div class="ui relaxed divided items">
+            <!-- item1 -->
+            <div class="item">
+              
+              <div class="ui small image">
+                <img src="../../static/images/templates/semantic-ui/album_imgs/lorde.jpg">
               </div>
-            </div>
-          </form>
-        </div>
-      </div>
-      <div class="ui vertical stripe segment">
-        <div class="ui middle aligned stackable grid container">
-          <div class="row">
-            <div class="eight wide column">
-              <h3 class="ui header">
-                More than 300,000 songs
-              </h3>
-              <p>
-                You can search almost any songs by artist name or song title or even playlist created by our users  
-              </p>
-              <h3 class="ui header">
-                Directly link to stream service
-              </h3>
-              <p>
-                Yes that's right, you are one click away to go to music stream services like Spotify, SoundCloud.
-              </p>
+
+              <div class="content">
+                
+                <a class="header">Song1 Name</a>
+                <div class="meta">
+                  <a>Album</a>
+                  <a>Playlist</a>
+                </div>
+                
+              </div>
+
             </div>
             
-              <div class="three wide right floated left aligned column">      
-                <img class="ui small bordered rounded image" src="../../static/images/templates/semantic-ui/album_imgs/lorde.jpg" />
-                <img class="ui small bordered rounded image" src="../../static/images/templates/semantic-ui/album_imgs/roots.jpg" />
+            <!-- item2 -->
+            <div class="item">
+              
+              <div class="ui small image">
+                <img src="../../static/images/templates/semantic-ui/album_imgs/lorde.jpg">
+              </div>
+
+              <div class="content">
+                
+                <a class="header">Song2 Name</a>
+                <div class="meta">
+                  <a>Album</a>
+                  <a>Playlist</a>
+                </div>
+                
+              </div>
+
+            </div> 
+        </div>
+      </div>
+      <!-- user info -->
+
+      <!-- search -->
+      <div class="ui container">
+        <form class="item">
+          <div class="ui search">
+            <div class="ui icon input">
+              <input class="prompt" type="text" placeholder="Search artist name or song title...">
+              <i class="search icon"></i>
             </div>
+          <div class="results"></div>
+        </form>
+      </div>
+      <!-- search -->
+
+    </div>
+  </div> <!-- pusher -->
+
       
-            <div class="three wide right floated left aligned column">      
-                <img class="ui small bordered rounded image" src="../../static/images/templates/semantic-ui/album_imgs/taylor.jpg" />
-                <img class="ui small bordered rounded image" src="../../static/images/templates/semantic-ui/album_imgs/greenday.jpg" />
-            </div>
-
-
-          </div>
-          <div class="row">
-            <div class="center aligned column">
-              <a class="ui huge inverted violet button">Check Them Out</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="ui vertical stripe quote segment">
-        <div class="ui equal width stackable internally celled grid">
-          <div class="center aligned row">
-            <div class="column">
-              <h3>
-                "Great Service!"
-              </h3>
-              <p>
-                That is what they all say about us
-              </p>
-            </div>
-            <div class="column">
-              <h3>
-                "I shouldn't have gone with their competitor."
-              </h3>
-              <p>
-                <img class="ui avatar image" src="../../static/images/templates/semantic-ui/avatar/nan.jpg" />John Sena
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- <div class="ui vertical stripe segment">
-        <div class="ui text container">
-          <h3 class="ui header">
-            Breaking The Grid, Grabs Your Attention
-          </h3>
-          <p>
-            Instead of focusing on content creation and hard work, we have learned how to master the art of doing nothing by providing massive amounts of whitespace and generic content that can seem massive, monolithic and worth your attention.
-          </p>
-          <a class="ui large button">Read More</a>
-          <h4 class="ui horizontal header divider">
-            <a href="homepage.html#"> Case Studies</a>
-          </h4>
-          <h3 class="ui header">
-            Did We Tell You About Our Bananas?
-          </h3>
-          <p>
-            Yes I know you probably disregarded the earlier boasts as non-sequitur filler content, but its really true. It took years of gene splicing and combinatory DNA research, but our bananas can really dance.
-          </p>
-          <a class="ui large button">I'm Still Quite Interested</a>
-        </div>
-      </div> -->
+      
+      
       <div class="ui inverted vertical footer segment">
         <div class="ui container">
           <div class="ui stackable inverted divided equal height stackable grid">
@@ -195,11 +167,7 @@
         margin-left: 0.5em;
       }
 
-      .masthead form.ui.fluid.form{
-
-        margin-top: 20em;
-        margin-bottom: 0em;
-      }
+      
       .masthead h1.ui.header {
         /*position: fixed;
         top: 50%;
@@ -301,8 +269,40 @@
       
           // create sidebar and attach to menu open
           $('.ui.sidebar')
-            .sidebar('attach events', '.toc.item')
-          ;
+            .sidebar('attach events', '.toc.item');
+
+          var content = [
+            { title: 'Andorra' },
+            { title: 'United Arab Emirates' },
+            { title: 'Afghanistan' },
+            { title: 'Antigua' },
+            { title: 'Anguilla' },
+            { title: 'Albania' },
+            { title: 'Armenia' },
+            { title: 'Netherlands Antilles' },
+            { title: 'Angola' },
+            { title: 'Argentina' },
+            { title: 'American Samoa' },
+            { title: 'Austria' },
+            { title: 'Australia' },
+            { title: 'Aruba' },
+            { title: 'Aland Islands' },
+            { title: 'Azerbaijan' },
+            { title: 'Bosnia' },
+            { title: 'Barbados' },
+            { title: 'Bangladesh' },
+            { title: 'Belgium' },
+            { title: 'Burkina Faso' },
+            { title: 'Bulgaria' },
+            { title: 'Bahrain' },
+            { title: 'Burundi' }
+          ];
+          $('.ui.search')
+            .search({
+            source: content
+          });
+
+
         })
       ;
     </script>
