@@ -3,3 +3,4 @@ py/Lib/*
 py/Scripts/*
 py/tcl/*
 py/Include/*
+py/config.py
