@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+    <head>
+		<link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
+		<script src="/jquery/jquery.min.js"></script>
+		<script src="/semantic-ui/semantic.min.js"></script>
+		<script src="/semantic-ui/calendar.min.js"></script>
+        <meta charset="UTF-8">
+        <title>Sign Up</title>
+		
+		<style type="text/css">
+			body {
+				background-color: #FFFFFF;
+			}
+			body > .grid {
+				height: 100%;
+			}
+			.searchcolumn {
+				max-width: 450px;
+				background-color: #FFFFFF;
+			}
+		</style>
+
+    </head>
+	
+	
+    <body>
+	
+	<div class="ui middle aligned center aligned grid">
+		<div class="column searchcolumn">
+			<h2 class="ui violet header">
+			<i class="add user icon"></i>
+			<div class="content">
+				Sign Up
+			</div>
+			</h2>
+			
+			<form class="ui large form searchform">
+			<div class="ui raised segment">
+				<div class="field">
+				<div class="ui left icon input">
+					<i class="user icon"></i>
+					<input type="text" name="username" placeholder="Username">
+				</div>
+				</div>
+				<div class="field">
+					<div class="ui left icon input">
+						<i class="lock icon"></i>
+						<input type="password" name="password" placeholder="Password">
+					</div>
+					</div>
+				<div class="field">
+					<div class="ui left icon input">
+						<i class="tv icon"></i>
+						<input type="text" name="nickname" placeholder="Nickname">
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui left icon input">
+						<i class="mail icon"></i>
+						<input type="text" name="email" placeholder="Email">
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui left icon input">
+						<i class="marker icon"></i>
+						<input type="text" name="city" placeholder="City">
+					</div>
+				</div>
+				
+				<div class="ui animated fluid large violet submit button">
+					<div class="visible content">Sign up</div>
+					<div class="hidden content">
+					  <i class="right arrow icon"></i>
+					</div>
+				</div>
+			</div>
+			<div class="ui error message"></div>	
+			</form>
+			
+			<div class="ui info message"> Already have an account? <a href="/login/">Sign in!</a></div>
+		</div>
+
+		
+	</div>
+
+
+	</body>
+	
+	<script>
+		$(document)
+			.ready(function() {
+			sessionStorage.clear();
+			$('.ui .searchform')
+				.form({
+					onSuccess: function (event) {
+						$('.ui .searchform').addClass("loading");
+						event.preventDefault();
+						$.ajax({
+        					type: 'post',
+							url: 'search.php',
+							data: $('form').serialize(),
+							success: function(data) {
+								if(data.status=="error") {
+									// console.log(data.error);
+									$('.ui .form').addClass("error");
+									$('.ui .error .message').text(data.error);
+									$('.ui.searchform').removeClass("loading");
+								}
+								if(data.status=="success"){
+									if(data.result.length==0) {
+										$('.ui .form').addClass("error");
+										$('.ui .error .message').text("No available restaurant found");
+										$('.ui.searchform').removeClass("loading");
+									}
+									else {
+										sessionStorage.setItem('userid', data.userid);
+										sessionStorage.setItem('numguests', $('input[name=numguests]').val());
+										sessionStorage.setItem('rsvptime', $('input[name=rsvptime]').val());
+										sessionStorage.setItem('restaurant', JSON.stringify(data.result));
+										window.location.href = "restaurant.html";
+									}
+								}
+							},
+						});     
+					},
+					fields: {
+						username: {
+						identifier  : 'username',
+						rules: [
+							{
+							type   : 'empty',
+							prompt : 'Please enter your username'
+							}
+						]
+						},
+						numguests: {
+						identifier  : 'numguests',
+						rules: [
+							{
+							type   : 'integer[1..]',
+							prompt : 'Please enter a valid number of guests'
+							}
+						]
+						},
+						rsvptime: {
+						identifier  : 'rsvptime',
+						rules: [
+							{
+							type   : 'empty',
+							prompt : 'Please select your reservation time'
+							}
+						]
+						}
+					}
+				});
+			$('#timepicker')
+				.calendar({
+					type: 'datetime',
+					disableMinute: true,
+					ampm: false
+				});
+			});
+			$('input').click(function(){
+				$('.ui .searchform').removeClass("error");
+			});
+	</script>
+</html>
