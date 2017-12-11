@@ -30,17 +30,23 @@
 		<div class="column restaurantcolumn">
 			<h2 class="ui violet header">
 			<i class="music icon"></i>
-			<div class="content">
-				Album
+			<div class="content" id="albumName">
+				
 			</div>
             </h2>
+            
+            <p>
+            <div class="content" id="albumDate">
+                
+            </div>    
+            </p>
             
             <table class="ui selectable celled table raised segment center aligned" id="tracktable">
                     <thead>
                       <tr><th>Track Name</th>
                       <th>Artist</th>
                       <th>Duration</th>
-                      <th>Like</th>
+                      <th>Rating</th>
                     </tr></thead>
                     <tbody>
             </table>
@@ -55,11 +61,12 @@
 	<script>
 		$(document)
 			.ready(function() {
+
                 $.ajax({
         				type: 'get',
 						url: '/api/getAlbum/',
 						data: {
-                            id: '4KWxhQCivZfyTZUISFKLeT'
+                            id: '731bZzgCiyc5rCtDQ3PiZA'
                         },
 						success: function(data) {
 							if(data.status=="error") {
@@ -70,17 +77,29 @@
                             }
 							if(data.status=="success"){
                                 data.tracks;
+                                //console.log(data);
                                 jQuery.each(data.tracks, function(i, row) {
-                                    // console.log(data);
+                                    $("#albumName").text("Album-"+data.title);
+                                    $("#albumDate").text("Released on "+data.time);
                                     $("#tracktable").append("<tr><td>" + row.title + "</td><td>"
                                     + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000)
-                                    + "</td><td><button class='ui violet button likebutton' value=" + row.tid
-                                    + ">Like</button></td></tr>");
+                                    + "</td><td><div class=\"ui star rating\" data-rating=\""+row.rating+"\" value = \""+row.tid+"\"></div></td></tr>");
+                                    
+                                    $('.ui.rating').rating({
+                                        maxRating: 5,
+                                        onRate: function (rating) {
+                                            console.log(rating);
+                                        }
+                                    });
+                                
+                                    
                                 });
 							}
 						}
                 });
 
+
+                //this click event is not being used
                 $(".likebutton").click(function() {
                     $('.ui .message').addClass("hidden");
                     $(".likebutton").addClass("disabled");
@@ -125,7 +144,6 @@
 						},
 					});
                 });
-
 
             });
 	</script>

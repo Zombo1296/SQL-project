@@ -158,13 +158,32 @@ def api_get_album():
         cur = conn.cursor()
         cur.execute('''SELECT title, time FROM `Album` WHERE alid = %s''', (id))
         albuminfo = cur.fetchone()
-        cur.execute('''SELECT tid, title, duration, by_aname FROM `Track` WHERE alid = %s''', (id))
+
+
+        #cur.execute('''SELECT tid, title, duration, by_aname FROM `Track` WHERE alid = %s''', (id))
+        cur.execute('''SELECT T_R.tid, title, duration, COALESCE(rate,0) AS rate, by_aname 
+                        From Track, 
+                            (SELECT T.tid,rate FROM
+
+                                (SELECT tid 
+                                    FROM Track WHERE alid = %s) AS T 
+
+                                LEFT JOIN 
+
+                                (SELECT rate,tid 
+                                    FROM Rating 
+                                    WHERE uid = '2') AS R
+
+                            ON R.tid = T.tid) AS T_R 
+
+                        WHERE Track.tid = T_R.tid''',(id)); 
+
         tracksinfo = cur.fetchall()
         cur.close()
         conn.close()
         tracksinfoList = []
         for row in tracksinfo:
-            tracksinfoList.append({'tid' : row[0], 'title' : row[1], 'duration' : row[2], 'artist': row[3]})
+            tracksinfoList.append({'tid' : row[0], 'title' : row[1], 'duration' : row[2], 'rating' : row[3], 'artist': row[4]})
 
         t = {'status': 'success', 'title': albuminfo[0], 'time': str(albuminfo[1]), 'tracks' : tracksinfoList}
     return Response(json.dumps(t), mimetype='application/json')
