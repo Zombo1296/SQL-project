@@ -15,21 +15,7 @@
     <script src="/jquery/jquery.min.js"></script>
   </head>
   <body>
-    <!-- hidden rolling menu -->
-    <div class="ui large top fixed hidden menu">
-      <div class="ui container">
-        <a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
-        <div class="right menu">
-          <div class="item">
-            <a class="ui button">Log in</a>
-          </div>
-          <div class="item">
-            <a class="ui primary button">Sign Up</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- hidden rolling menu -->
+    
 
     <!--Sidebar Menu-->
     <div class="ui vertical inverted sidebar menu">
@@ -45,7 +31,7 @@
           <div class="ui large secondary inverted pointing menu">
             <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
             <div class="right item">
-              <a class="ui inverted button">Log in</a><a class="ui inverted button">Sign Up</a>
+              <a class="ui inverted button" id="login">Log in</a><a class="ui inverted button signup">Sign Up</a>
             </div>
           </div>
         </div>
@@ -57,7 +43,7 @@
           <h2>
             Listen to whatever you want when you want to.
           </h2>
-          <div class="ui inverted button">
+          <div class="ui inverted button signup">
             Join Now!<i class="right arrow icon"></i>
           </div>
         </div>
@@ -299,8 +285,13 @@
           $('.ui.sidebar')
             .sidebar('attach events', '.toc.item')
           ;
-        })
-      ;
+        });
+    $('.signup').click(function(){
+      window.location.href = "/signup/";
+		});
+    $('#login').click(function(){
+      window.location.href = "/login/";
+		});
     </script>
   </body>
 </html>
