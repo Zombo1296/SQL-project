@@ -52,7 +52,7 @@ def login():
 
 @app.route('/album/')
 def album():
-    return app.send_static_file('album.html')
+    return app.send_static_file('album2.html')
 
 
 
