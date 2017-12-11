@@ -14,10 +14,10 @@
     <div class="ui middle aligned center aligned column grid">
       <div class="row"></div>
       <div class="row"></div>
-      <div class="row">
+      <div class="eight wide column segment">
         <div class="ui fluid category search">
-          <div class="ui icon input">
-            <input class="prompt" type="text" placeholder="Search animals...">
+          <div class="ui  icon input">
+            <input class="prompt" type="text" placeholder="Search anything...">
             <i class="search icon"></i>
           </div>
           <div class="results"></div>
@@ -195,6 +195,17 @@
           },
         });
       });
-    });</script>
+    });
+
+    $('.ui.search')
+    .search({
+      type: 'category',
+      apiSettings: {
+        url: '/api/search/?q={query}'
+      },
+    })
+  ;
+    
+    </script>
 
 </html>

@@ -237,5 +237,62 @@ def api_get_my_related_playlists():
     return Response(json.dumps(t), mimetype='application/json')
 
 
+@app.route('/api/search/', methods=['GET'])
+def api_search():
+    username = session.get('username', None)
+    q = request.args.get('q')
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+    elif q == None or len(q) > 20:
+        t = {'status': 'error', 'error': 'Invalid input'}
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT title, by_aname, alid FROM Track
+                        WHERE (MATCH(title)
+                        AGAINST (%s IN BOOLEAN MODE))
+                        ORDER BY MATCH(title)
+                        AGAINST (%s IN BOOLEAN MODE) DESC
+                        LIMIT 3;''', (q + '*', q + '*'))
+        tracks = cur.fetchall()
+
+        cur.execute('''SELECT title, alid FROM Album
+                        WHERE (MATCH(title)
+                        AGAINST (%s IN BOOLEAN MODE))
+                        ORDER BY MATCH(title)
+                        AGAINST (%s IN BOOLEAN MODE) DESC
+                        LIMIT 3;''', (q + '*', q + '*'))
+        albums = cur.fetchall()
+
+        cur.execute('''SELECT aname, aid FROM Artist
+                        WHERE (MATCH(aname, description)
+                        AGAINST (%s IN BOOLEAN MODE))
+                        ORDER BY
+                        MATCH(aname, description)
+                        AGAINST (%s IN BOOLEAN MODE) DESC
+                        LIMIT 3;''', (q + '*', q + '*'))
+        artists = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        trackList = []
+        for row in tracks:
+            trackList.append({'title': row[0], 'description': row[1], 'album': row[2]})
+        category1 = {'name': "Tracks", 'results' : trackList}
+
+        artistList = []
+        for row in artists:
+            artistList.append({'title': row[0], 'aid': row[1]})
+        category2 = {'name': "Artists", 'results': artistList}
+
+        albumList = []
+        for row in albums:
+            albumList.append({'title': row[0], 'aid': row[1]})
+        category3 = {'name': "Albums", 'results': albumList}
+        results = {'category1': category1, 'category2': category2, 'category3': category3}
+        t = {'status': 'success', 'results': results}
+    return Response(json.dumps(t), mimetype='application/json')
+
+
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
