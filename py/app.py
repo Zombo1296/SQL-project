@@ -1,5 +1,5 @@
 from flask import Flask, request, send_from_directory, Response, session
-from flaskext.mysql import MySQL
+from flask_mysqldb import MySQL
 from flask_session import Session
 import hashlib
 import json
