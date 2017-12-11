@@ -182,7 +182,7 @@ def api_get_new_tracks():
                             WHERE Track.by_aname = Likes.aname
                             AND Likes.uid = User.uid
                             AND User.uname = %s
-                            LIMIT 5;''', (username))
+                            LIMIT 7;''', (username))
         tracksinfo = cur.fetchall()
         cur.close()
         conn.close()
@@ -210,7 +210,7 @@ def api_get_my_playlists():
         playlistsList = []
         for row in playlists:
             playlistsList.append({'plid': row[0], 'title': row[1], 'time': str(row[2]), 'count': row[3]})
-        t = {'status': 'success', 'tracks': playlistsList}
+        t = {'status': 'success', 'playlists': playlistsList}
     return Response(json.dumps(t), mimetype='application/json')
 
 
@@ -232,8 +232,8 @@ def api_get_my_related_playlists():
         conn.close()
         playlistsList = []
         for row in playlists:
-            playlistsList.append({'plid': row[0], 'title': row[1], 'time': str(row[2]), 'count': row[3]})
-        t = {'status': 'success', 'tracks': playlistsList}
+            playlistsList.append({'plid': row[0], 'title': row[1], 'time': str(row[2]), 'count': row[3], 'uname': row[4]})
+        t = {'status': 'success', 'playlists': playlistsList}
     return Response(json.dumps(t), mimetype='application/json')
 
 
