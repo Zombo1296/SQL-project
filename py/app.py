@@ -1,5 +1,5 @@
 from flask import Flask, request, send_from_directory, Response, session
-from flask_mysqldb import MySQL
+from flaskext.mysql import MySQL
 from flask_session import Session
 import hashlib
 import json
@@ -7,7 +7,8 @@ import json
 app=Flask(__name__, static_url_path='')
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
-mysql = MySQL(app)
+mysql = MySQL()
+mysql.init_app(app)
 Session(app)
 
 
@@ -20,7 +21,8 @@ def root():
 
 @app.route('/users/')
 def users():
-    cur = mysql.connection.cursor()
+    conn = mysql.connect()
+    cur = conn.cursor()
     cur.execute('''SELECT * FROM `Artist` WHERE aname = "Adele"''')
     rv = cur.fetchall()
     return str(rv)
@@ -60,32 +62,31 @@ def add_user():
         t = {'status': 'error', 'error': 'Invalid input'}
         return Response(json.dumps(t), mimetype='application/json')
 
-    mysql.connection.start_transaction(isolation_level='SERIALIZABLE')
-    cur = mysql.connection.cursor()
-    cur.execute('''SELECT uname FROM `User` WHERE uname = "User"''')
-    rv = cur.fetchone()
-    print(rv)
-    mysql.connection.rollback()
-
     password = password + username
-
     m = hashlib.sha1()
     m.update(password.encode('utf-8'))
     password = m.hexdigest()
-    print(len(password))
 
-
-    print(username)
-    print(password)
-    print(nickname)
-    print(city)
-    print(email)
-
-    t = {'status': 'success', 'error': 'Invalid input'}
-    sess = session.get('username', 'not set')
-    print(sess)
-
-    return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute("SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+    cur.execute("START TRANSACTION")
+    cur.execute('''SELECT uname FROM `User` WHERE uname = "User"''')
+    rv = cur.fetchone()
+    if rv == None:
+        cur.execute(''' INSERT INTO User(uname, nickname, email, password, city) VALUES (%s, %s, %s, %s, %s)''' ,
+                    (username, nickname, email, password, city))
+        conn.commit()
+        cur.close()
+        conn.close()
+        t = {'status': 'success'}
+        return Response(json.dumps(t), mimetype='application/json')
+    else:
+        cur.close()
+        conn.rollback()
+        conn.close()
+        t = {'status': 'success', 'error': 'Invalid input'}
+        return Response(json.dumps(t), mimetype='application/json')
 
 
 if __name__ == '__main__':
