@@ -45,6 +45,8 @@ def add_user():
     nickname = request.args.get("nickname")
     city = request.args.get("city")
     t = {'a' : 'test'}
+
+
     return Response(json.dumps(t), mimetype='application/json')
 
 
