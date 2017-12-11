@@ -3,13 +3,23 @@ from flaskext.mysql import MySQL
 from flask_session import Session
 import hashlib
 import json
+import os
+import datetime
 
 app=Flask(__name__, static_url_path='')
+
+app.config['SESSION_TYPE'] = 'filesystem'
+
 app.config.from_object('config')
-app.config.from_pyfile('config.py')
+
+app.secret_key = os.urandom(24)
+app.permanent_session_lifetime = datetime.timedelta(seconds=10*60)
+Session(app)
+
+
 mysql = MySQL()
 mysql.init_app(app)
-Session(app)
+
 
 
 
@@ -122,8 +132,16 @@ def api_login():
     else:
         if password == rv[0]:
             t = {'status': 'success'}
+            session.permanent = True
+            session['username'] = username
         else:
             t = {'status': 'error', 'error': 'Invalid username or password'}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/logout/', methods=['POST'])
+def api_logout():
+    session.pop('username', None)
+    t = {'status': 'success'}
     return Response(json.dumps(t), mimetype='application/json')
 
 
