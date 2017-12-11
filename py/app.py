@@ -50,6 +50,10 @@ def signup():
 def login():
     return app.send_static_file('login.html')
 
+@app.route('/album/')
+def album():
+    return app.send_static_file('album.html')
+
 
 
 
@@ -142,6 +146,27 @@ def api_login():
 def api_logout():
     session.pop('username', None)
     t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/getAlbum/', methods=['GET'])
+def api_get_album():
+    id = request.args.get('id')
+    if(len(id) != 22):
+        t = {'status': 'error', 'error': 'Invalid id'}
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT title, time FROM `Album` WHERE alid = %s''', (id))
+        albuminfo = cur.fetchone()
+        cur.execute('''SELECT tid, title, duration, by_aname FROM `Track` WHERE alid = %s''', (id))
+        tracksinfo = cur.fetchall()
+        cur.close()
+        conn.close()
+        tracksinfoList = []
+        for row in tracksinfo:
+            tracksinfoList.append({'tid' : row[0], 'title' : row[1], 'duration' : row[2], 'artist': row[3]})
+
+        t = {'status': 'success', 'title': albuminfo[0], 'time': str(albuminfo[1]), 'tracks' : tracksinfoList}
     return Response(json.dumps(t), mimetype='application/json')
 
 
