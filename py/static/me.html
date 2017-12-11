@@ -112,6 +112,10 @@
                         <br>
                         <a>In __ Playlist<i class="share icon"></i></a>
                       </div>
+                      <div class="extra">
+                        <div class="ui star rating" data-rating="4">
+                        </div>
+                      </div>
                     </div>
 
                   </div>
@@ -280,6 +284,9 @@
     <script>
       $(document)
         .ready(function() {
+
+          $(".rating").rating();
+
           // fix menu when passed
           $('.masthead')
             .visibility({
