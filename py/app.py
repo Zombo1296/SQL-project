@@ -50,8 +50,5 @@ def add_user():
     return Response(json.dumps(t), mimetype='application/json')
 
 
-
-
-
 if __name__ == '__main__':
     app.run()
