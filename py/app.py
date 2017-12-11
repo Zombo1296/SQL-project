@@ -214,5 +214,28 @@ def api_get_my_playlists():
     return Response(json.dumps(t), mimetype='application/json')
 
 
+@app.route('/api/getmyrelatedplaylists/', methods=['GET'])
+def api_get_my_related_playlists():
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT plid, title, Playlist.time, count, u2.uname FROM Playlist, User u1, Follow, User u2
+                        WHERE Playlist.by_uid = Follow.f_uid
+                        AND Follow.uid = u1.uid
+                        AND u1.uname = %s
+                        AND u2.uid = Follow.f_uid''', (username))
+        playlists = cur.fetchall()
+        cur.close()
+        conn.close()
+        playlistsList = []
+        for row in playlists:
+            playlistsList.append({'plid': row[0], 'title': row[1], 'time': str(row[2]), 'count': row[3]})
+        t = {'status': 'success', 'tracks': playlistsList}
+    return Response(json.dumps(t), mimetype='application/json')
+
+
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
