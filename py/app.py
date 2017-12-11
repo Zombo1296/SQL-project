@@ -1,6 +1,7 @@
 from flask import Flask, request, send_from_directory, Response, session
 from flask_mysqldb import MySQL
 from flask_session import Session
+import hashlib
 import json
 
 app=Flask(__name__, static_url_path='')
@@ -49,12 +50,38 @@ def add_user():
     email = request.form.get("email")
 
     print(username)
+    print(len(password))
+    print(nickname)
+    print(city)
+    print(email)
+
+    if(username == None or password == None or len(password) != 40 or nickname != None and len(nickname) > 45
+       or city != None and len(city) > 45 or email != None and len(email) > 45):
+        t = {'status': 'error', 'error': 'Invalid input'}
+        return Response(json.dumps(t), mimetype='application/json')
+
+    mysql.connection.start_transaction(isolation_level='SERIALIZABLE')
+    cur = mysql.connection.cursor()
+    cur.execute('''SELECT uname FROM `User` WHERE uname = "User"''')
+    rv = cur.fetchone()
+    print(rv)
+    mysql.connection.rollback()
+
+    password = password + username
+
+    m = hashlib.sha1()
+    m.update(password.encode('utf-8'))
+    password = m.hexdigest()
+    print(len(password))
+
+
+    print(username)
     print(password)
     print(nickname)
     print(city)
     print(email)
 
-    t = {'status' : 'error', 'error': 'Haha'}
+    t = {'status': 'success', 'error': 'Invalid input'}
     sess = session.get('username', 'not set')
     print(sess)
 
@@ -62,4 +89,4 @@ def add_user():
 
 
 if __name__ == '__main__':
-    app.run(port = 80, debug = True)
+    app.run(port = 5000, debug = True)

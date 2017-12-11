@@ -78,7 +78,7 @@
 			<div class="ui error message"></div>	
 			</form>
 			
-			<div class="ui info message"> Already have an account? <a href="/login/">Sign in!</a></div>
+			<div class="ui info message" id="info"> Already have an account? <a href="/login/">Sign in!</a></div>
 		</div>
 
 		
@@ -113,7 +113,12 @@
 									$('.ui.searchform').removeClass("loading");
 								}
 								if(data.status=="success"){
-									window.location.href = "restaurant.html";
+									$('#info').removeClass("info");
+									$('#info').text("Sign up succeed!");
+									$('#info').addClass("violet");
+									setTimeout(function(){
+										window.location.href = "/login/";
+									}, 3000);
 								}
 							},
 						});     
