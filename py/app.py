@@ -1,11 +1,13 @@
-from flask import Flask, request, send_from_directory, Response
+from flask import Flask, request, send_from_directory, Response, session
 from flask_mysqldb import MySQL
+from flask_session import Session
 import json
 
 app=Flask(__name__, static_url_path='')
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
 mysql = MySQL(app)
+Session(app)
 
 
 
@@ -38,17 +40,26 @@ def login():
 
 
 
-@app.route('/addUser/', methods=['POST'])
+@app.route('/api/addUser/', methods=['POST'])
 def add_user():
-    uname = request.args.get("uname")
-    password = request.args.get("password")
-    nickname = request.args.get("nickname")
-    city = request.args.get("city")
-    t = {'a' : 'test'}
+    username = request.form.get('username')
+    password = request.form.get("password")
+    nickname = request.form.get("nickname")
+    city = request.form.get("city")
+    email = request.form.get("email")
 
+    print(username)
+    print(password)
+    print(nickname)
+    print(city)
+    print(email)
+
+    t = {'status' : 'error', 'error': 'Haha'}
+    sess = session.get('username', 'not set')
+    print(sess)
 
     return Response(json.dumps(t), mimetype='application/json')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port = 80, debug = True)

@@ -3,8 +3,8 @@
     <head>
 		<link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
 		<script src="/jquery/jquery.min.js"></script>
+		<script src="/jquery/sha1.js"></script>
 		<script src="/semantic-ui/semantic.min.js"></script>
-		<script src="/semantic-ui/calendar.min.js"></script>
         <meta charset="UTF-8">
         <title>Sign Up</title>
 		
@@ -95,31 +95,25 @@
 				.form({
 					onSuccess: function (event) {
 						$('.ui .searchform').addClass("loading");
+						var shaObj = new jsSHA("SHA-1", "TEXT");
+						shaObj.update($(':password').val());
+						var hash = shaObj.getHash("HEX");
+						$(':password').val(hash);
 						event.preventDefault();
 						$.ajax({
         					type: 'post',
-							url: 'search.php',
+							url: '/api/addUser/',
 							data: $('form').serialize(),
 							success: function(data) {
 								if(data.status=="error") {
 									// console.log(data.error);
 									$('.ui .form').addClass("error");
 									$('.ui .error .message').text(data.error);
+									$(':password').val("");
 									$('.ui.searchform').removeClass("loading");
 								}
 								if(data.status=="success"){
-									if(data.result.length==0) {
-										$('.ui .form').addClass("error");
-										$('.ui .error .message').text("No available restaurant found");
-										$('.ui.searchform').removeClass("loading");
-									}
-									else {
-										sessionStorage.setItem('userid', data.userid);
-										sessionStorage.setItem('numguests', $('input[name=numguests]').val());
-										sessionStorage.setItem('rsvptime', $('input[name=rsvptime]').val());
-										sessionStorage.setItem('restaurant', JSON.stringify(data.result));
-										window.location.href = "restaurant.html";
-									}
+									window.location.href = "restaurant.html";
 								}
 							},
 						});     
@@ -134,31 +128,47 @@
 							}
 						]
 						},
-						numguests: {
-						identifier  : 'numguests',
+						password: {
+							identifier: 'password',
+							rules: [
+							  {
+								type   : 'empty',
+								prompt : 'Please enter a password'
+							  },
+							  {
+								type   : 'minLength[6]',
+								prompt : 'Your password must be at least {ruleValue} characters'
+							  }
+							]
+						  },
+						email: {
+						identifier  : 'email',
 						rules: [
 							{
-							type   : 'integer[1..]',
-							prompt : 'Please enter a valid number of guests'
+							type   : 'email',
+							prompt : 'Please enter a valid email'
 							}
 						]
 						},
-						rsvptime: {
-						identifier  : 'rsvptime',
+						nickname: {
+						identifier  : 'nickname',
 						rules: [
 							{
-							type   : 'empty',
-							prompt : 'Please select your reservation time'
+							type   : 'maxLength[45]',
+							prompt : 'Sorry, your Nickname is too long'
+							}
+						]
+						},
+						city: {
+						identifier  : 'city',
+						rules: [
+							{
+							type   : 'maxLength[45]',
+							prompt : 'Sorry, your city is too long'
 							}
 						]
 						}
 					}
-				});
-			$('#timepicker')
-				.calendar({
-					type: 'datetime',
-					disableMinute: true,
-					ampm: false
 				});
 			});
 			$('input').click(function(){
