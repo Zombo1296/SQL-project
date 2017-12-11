@@ -16,7 +16,7 @@
       <div class="row"></div>
       <div class="eight wide column segment">
         <div class="ui fluid category search">
-          <div class="ui  icon input">
+          <div class="ui icon input">
             <input class="prompt" type="text" placeholder="Search anything...">
             <i class="search icon"></i>
           </div>
@@ -197,15 +197,11 @@
       });
     });
 
-    $('.ui.search')
-    .search({
+    $('.ui.search').search({
       type: 'category',
       apiSettings: {
         url: '/api/search/?q={query}'
       },
-    })
-  ;
-    
-    </script>
+    });</script>
 
 </html>
