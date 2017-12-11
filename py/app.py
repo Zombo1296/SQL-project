@@ -193,5 +193,26 @@ def api_get_new_tracks():
     return Response(json.dumps(t), mimetype='application/json')
 
 
+@app.route('/api/getmyplaylists/', methods=['GET'])
+def api_get_my_playlists():
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT plid, title, time, count FROM Playlist, User
+                        WHERE Playlist.by_uid = User.uid
+                        AND uname = %s;''', (username))
+        playlists = cur.fetchall()
+        cur.close()
+        conn.close()
+        playlistsList = []
+        for row in playlists:
+            playlistsList.append({'plid': row[0], 'title': row[1], 'time': str(row[2]), 'count': row[3]})
+        t = {'status': 'success', 'tracks': playlistsList}
+    return Response(json.dumps(t), mimetype='application/json')
+
+
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
