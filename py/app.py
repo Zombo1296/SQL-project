@@ -170,5 +170,28 @@ def api_get_album():
     return Response(json.dumps(t), mimetype='application/json')
 
 
+@app.route('/api/getnewtracks/', methods=['GET'])
+def api_get_new_tracks():
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT tid, title, duration, aname, alid FROM Track, Likes, User
+                            WHERE Track.by_aname = Likes.aname
+                            AND Likes.uid = User.uid
+                            AND User.uname = %s
+                            LIMIT 5;''', (username))
+        tracksinfo = cur.fetchall()
+        cur.close()
+        conn.close()
+        tracksinfoList = []
+        for row in tracksinfo:
+            tracksinfoList.append({'tid': row[0], 'title': row[1], 'duration': row[2], 'artist': row[3], 'album': row[4]})
+        t = {'status': 'success', 'tracks': tracksinfoList}
+    return Response(json.dumps(t), mimetype='application/json')
+
+
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
