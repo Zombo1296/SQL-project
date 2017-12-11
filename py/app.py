@@ -1,5 +1,6 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, Response
 from flask_mysqldb import MySQL
+import json
 
 app=Flask(__name__, static_url_path='')
 app.config.from_object('config')
@@ -23,7 +24,28 @@ def users():
 
 @app.route('/me/')
 def me():
-    return app.send_static_file('logged_in.html')
+    return app.send_static_file('me.html')
+
+
+@app.route('/signup/')
+def signup():
+    return app.send_static_file('signup.html')
+
+@app.route('/login/')
+def login():
+    return app.send_static_file('login.html')
+
+
+
+
+@app.route('/addUser/', methods=['POST'])
+def add_user():
+    uname = request.args.get("uname")
+    password = request.args.get("password")
+    nickname = request.args.get("nickname")
+    city = request.args.get("city")
+    t = {'a' : 'test'}
+    return Response(json.dumps(t), mimetype='application/json')
 
 
 
