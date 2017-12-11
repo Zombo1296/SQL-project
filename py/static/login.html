@@ -3,10 +3,10 @@
     <head>
 		<link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
 		<script src="/jquery/jquery.min.js"></script>
+		<script src="/jquery/sha1.js"></script>
 		<script src="/semantic-ui/semantic.min.js"></script>
-		<script src="/semantic-ui/calendar.min.js"></script>
         <meta charset="UTF-8">
-        <title>Sign Up</title>
+        <title>Login</title>
 		
 		<style type="text/css">
 			body {
@@ -29,7 +29,7 @@
 	<div class="ui middle aligned center aligned grid">
 		<div class="column searchcolumn">
 			<h2 class="ui violet header">
-			<i class="user icon"></i>
+			<i class="add user icon"></i>
 			<div class="content">
 				Login
 			</div>
@@ -45,24 +45,10 @@
 				</div>
 				<div class="field">
 					<div class="ui left icon input">
-						<i class="users icon"></i>
-						<input type="number" name="numguests" placeholder="Number of guests">
+						<i class="lock icon"></i>
+						<input type="password" name="password" placeholder="Password">
 					</div>
-					</div>
-				<div class="field">
-					<div class="ui left icon input">
-						<i class="idea icon"></i>
-						<input type="text" name="keyword" placeholder="Keyword">
-					</div>
-				</div>
-				<div class="field">
-					<div class="ui calendar" id="timepicker">
-						<div class="ui left icon input">
-							<i class="calendar outline icon"></i>
-							<input type="text" name="rsvptime" placeholder="Reservation time">
-						</div>
-					</div>
-				</div>
+					</div>				
 				<div class="ui animated fluid large violet submit button">
 					<div class="visible content">Login</div>
 					<div class="hidden content">
@@ -72,6 +58,8 @@
 			</div>
 			<div class="ui error message"></div>	
 			</form>
+			
+			<div class="ui info message" id="info"> Don't have an account yet? <a href="/signup/">Sign up!</a></div>
 		</div>
 
 		
@@ -88,31 +76,30 @@
 				.form({
 					onSuccess: function (event) {
 						$('.ui .searchform').addClass("loading");
+						var shaObj = new jsSHA("SHA-1", "TEXT");
+						shaObj.update($(':password').val());
+						var hash = shaObj.getHash("HEX");
+						$(':password').val(hash);
 						event.preventDefault();
 						$.ajax({
         					type: 'post',
-							url: 'search.php',
+							url: '/api/login/',
 							data: $('form').serialize(),
 							success: function(data) {
 								if(data.status=="error") {
 									// console.log(data.error);
 									$('.ui .form').addClass("error");
 									$('.ui .error .message').text(data.error);
+									$(':password').val("");
 									$('.ui.searchform').removeClass("loading");
 								}
 								if(data.status=="success"){
-									if(data.result.length==0) {
-										$('.ui .form').addClass("error");
-										$('.ui .error .message').text("No available restaurant found");
-										$('.ui.searchform').removeClass("loading");
-									}
-									else {
-										sessionStorage.setItem('userid', data.userid);
-										sessionStorage.setItem('numguests', $('input[name=numguests]').val());
-										sessionStorage.setItem('rsvptime', $('input[name=rsvptime]').val());
-										sessionStorage.setItem('restaurant', JSON.stringify(data.result));
-										window.location.href = "restaurant.html";
-									}
+									$('#info').removeClass("info");
+									$('#info').text("Login succeed!");
+									$('#info').addClass("violet");
+									setTimeout(function(){
+										window.location.href = "/login/";
+									}, 3000);
 								}
 							},
 						});     
@@ -127,31 +114,20 @@
 							}
 						]
 						},
-						numguests: {
-						identifier  : 'numguests',
-						rules: [
-							{
-							type   : 'integer[1..]',
-							prompt : 'Please enter a valid number of guests'
-							}
-						]
-						},
-						rsvptime: {
-						identifier  : 'rsvptime',
-						rules: [
-							{
-							type   : 'empty',
-							prompt : 'Please select your reservation time'
-							}
-						]
-						}
+						password: {
+							identifier: 'password',
+							rules: [
+							  {
+								type   : 'empty',
+								prompt : 'Please enter a password'
+							  },
+							  {
+								type   : 'minLength[6]',
+								prompt : 'Your password must be at least {ruleValue} characters'
+							  }
+							]
+						  }
 					}
-				});
-			$('#timepicker')
-				.calendar({
-					type: 'datetime',
-					disableMinute: true,
-					ampm: false
 				});
 			});
 			$('input').click(function(){

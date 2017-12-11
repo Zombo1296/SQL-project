@@ -44,23 +44,26 @@ def login():
 
 
 @app.route('/api/addUser/', methods=['POST'])
-def add_user():
+def api_add_user():
     username = request.form.get('username')
     password = request.form.get("password")
     nickname = request.form.get("nickname")
     city = request.form.get("city")
     email = request.form.get("email")
 
-    print(username)
-    print(len(password))
-    print(nickname)
-    print(city)
-    print(email)
+    print (username)
+    print (password)
+    print (nickname)
+    print (city)
+    print (email)
 
-    if(username == None or password == None or len(password) != 40 or nickname != None and len(nickname) > 45
+    if(username == None or password == None or len(username) > 45 or
+               len(password) != 40 or nickname != None and len(nickname) > 45
        or city != None and len(city) > 45 or email != None and len(email) > 45):
         t = {'status': 'error', 'error': 'Invalid input'}
         return Response(json.dumps(t), mimetype='application/json')
+
+    username = username.lower()
 
     password = password + username
     m = hashlib.sha1()
@@ -71,7 +74,7 @@ def add_user():
     cur = conn.cursor()
     cur.execute("SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE")
     cur.execute("START TRANSACTION")
-    cur.execute('''SELECT uname FROM `User` WHERE uname = "User"''')
+    cur.execute('''SELECT uname FROM `User` WHERE uname = %s''', (username))
     rv = cur.fetchone()
     if rv == None:
         cur.execute(''' INSERT INTO User(uname, nickname, email, password, city) VALUES (%s, %s, %s, %s, %s)''' ,
@@ -85,8 +88,43 @@ def add_user():
         cur.close()
         conn.rollback()
         conn.close()
-        t = {'status': 'success', 'error': 'Invalid input'}
+        t = {'status': 'error', 'error': 'Username already exists.'}
         return Response(json.dumps(t), mimetype='application/json')
+
+
+@app.route('/api/login/', methods=['POST'])
+def api_login():
+    username = request.form.get('username')
+    password = request.form.get("password")
+
+    # print (username)
+    # print (password)
+
+    if(username == None or password == None or len(username) > 45 or
+               len(password) != 40):
+        t = {'status': 'error', 'error': 'Invalid input'}
+        return Response(json.dumps(t), mimetype='application/json')
+
+    username = username.lower()
+    password = password + username
+    m = hashlib.sha1()
+    m.update(password.encode('utf-8'))
+    password = m.hexdigest()
+
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''SELECT password FROM `User` WHERE uname = %s''', (username))
+    rv = cur.fetchone()
+    conn.rollback()
+    conn.close()
+    if rv == None:
+        t = {'status': 'error', 'error': 'Invalid username or password'}
+    else:
+        if password == rv[0]:
+            t = {'status': 'success'}
+        else:
+            t = {'status': 'error', 'error': 'Invalid username or password'}
+    return Response(json.dumps(t), mimetype='application/json')
 
 
 if __name__ == '__main__':
