@@ -50,9 +50,9 @@ def signup():
 def login():
     return app.send_static_file('login.html')
 
-@app.route('/album/')
-def album():
-    return app.send_static_file('album.html')
+@app.route('/album/<id>')
+def album(id):
+    return render_template('album.html', id=id)
 
 @app.route('/user/<name>')
 def user(name):
@@ -193,6 +193,7 @@ def api_logout():
 @app.route('/api/getAlbum/', methods=['GET'])
 def api_get_album():
     id = request.args.get('id')
+    print(id)
     if (len(id) != 22):
         t = {'status': 'error', 'error': 'Invalid id'}
         return Response(json.dumps(t), mimetype='application/json')
