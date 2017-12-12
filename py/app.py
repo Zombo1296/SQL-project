@@ -70,6 +70,10 @@ def add_playlist():
 def playlist(id):
     return render_template('playlist.html', id=id)
 
+@app.route('/artist/<id>')
+def artist(id):
+    return render_template('artist.html', id=id)
+
 
 @app.route('/api/insert_update_rating/', methods=['POST'])
 def api_insert_update_rating():
@@ -360,7 +364,7 @@ def api_search():
 
         artistList = []
         for row in artists:
-            artistList.append({'title': row[0], 'aid': row[1]})
+            artistList.append({'title': row[0], 'aid': row[1], 'url': '/artist/' + row[0]})
         category2 = {'name': "Artists", 'results': artistList}
 
         albumList = []
@@ -580,6 +584,126 @@ def api_get_playlist():
 
         t = {'status': 'success', 'title': plinfo[0], 'time': str(plinfo[1]), 'tracks' : tracksinfoList}
     return Response(json.dumps(t), mimetype='application/json')
+
+
+@app.route('/api/getartistalbums/', methods=['GET'])
+def api_get_artist_albums():
+    aname = request.args.get('artistname')
+    print(aname)
+    if (aname == None):
+        t = {'status': 'error', 'error': 'Invalid id'}
+        return Response(json.dumps(t), mimetype='application/json')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT DISTINCT Track.alid, Album.title, Album.time FROM Track, Album
+                    WHERE by_aname = %s AND Track.alid = Album.alid LIMIT 8''', (aname));
+        albuminfo = cur.fetchall()
+        cur.close()
+        conn.close()
+        albums = []
+        print (albums)
+        for row in albuminfo:
+            print (row)
+            albums.append({'alid' : row[0], 'title' : row[1], 'time' : str(row[2])})
+
+        t = {'status': 'success', 'albums' : albums}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/getartist/', methods=['GET'])
+def api_get_artist():
+    aname = request.args.get('artistname')
+    print(aname)
+    if (aname == None):
+        t = {'status': 'error', 'error': 'Invalid id'}
+        return Response(json.dumps(t), mimetype='application/json')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT COUNT(DISTINCT uid) FROM Likes WHERE aname = %s''', (aname));
+        albuminfo = cur.fetchone()
+        cur.close()
+        conn.close()
+        t = {'status': 'success', 'fans' : albuminfo[0]}
+    return Response(json.dumps(t), mimetype='application/json')
+
+
+@app.route('/api/getlikestatus/', methods=['GET'])
+def api_get_like_status():
+    aname = request.args.get('artistname')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (aname == None):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''SELECT COUNT(User.uid) FROM Likes, User
+                    WHERE Likes.uid = User.uid AND uname = %s AND aname = %s ''', (username, aname))
+    followcount = cur.fetchone()
+    cur.close()
+    conn.close()
+    t = {'status': 'success', 'followstatus': followcount[0]}
+
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/like/', methods=['POST'])
+def api_like():
+    aname = request.form.get('artistname')
+    username = session.get('username', None)
+
+    print (aname)
+    print (username)
+
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (aname == None):
+        t = {'status': 'error', 'error': 'Invalid aname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''INSERT INTO Likes (uid, aname) SELECT uid, %s FROM User
+                    WHERE User.uname = %s
+                    ON DUPLICATE KEY
+                    UPDATE time = VALUES(time); ''', (aname, username))
+    cur.execute("COMMIT;");
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/unlike/', methods=['POST'])
+def api_un_like():
+    aname = request.form.get('artistname')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (aname == None):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''DELETE FROM Likes
+                    WHERE uid IN (SELECT uid FROM User WHERE uname = %s)
+                    AND aname = %s; ''', (username, aname))
+    cur.execute("COMMIT;");
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
