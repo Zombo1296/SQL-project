@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
+    <script src="/jquery/jquery.min.js"></script>
+    <script src="/jquery/sha1.js"></script>
+    <script src="/semantic-ui/semantic.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Add Playlist</title>
+    <style type="text/css">body { background-color: #FFFFFF; } body > .grid { height: 100%; } .restaurantcolumn { max-width: 1000px; background-color: #FFFFFF; }</style>
+  </head>
+  <body>
+    <div class="ui middle aligned center aligned grid">
+      <div class="column restaurantcolumn">
+        <h2 class="ui violet header">
+          <i class="music icon"></i>
+          <div class="content" id="albumName"></div>
+        </h2>
+        <p>
+        <div class="content" id="albumDate"></div>
+        </p>
+        <table class="ui selectable celled table raised segment center aligned" id="myplaylists">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Playlist Name</th>
+              <th>Created on</th>
+              <th>Play Times</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tfoot class="full-width">
+            <tr>
+              <th colspan="4">
+                <div class="ui left floated small violet labeled icon button" id="addbutton">
+                  <i class="add icon"></i> Add Playlist
+                </div>
+                <div class="ui right floated small green labeled icon button" id="confirmbutton">
+                  <i class="check icon"></i> Confirm
+                </div>
+              </th>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="ui negative message hidden"></div>
+      </div>
+    </div>
+  </body>
+  <script>$(document).ready(function() {
+    $.ajax({
+      type: 'get',
+      url: '/api/getmyplaylists/',
+      data: {},
+      success: function(data) {
+        if (data.status == "error") {
+          $('.ui .message').text(data.error);
+          $('.ui .message').removeClass("hidden");
+          $('.ui .detailbutton').removeClass("loading");
+          $('.ui .detailbutton').removeClass("disabled");
+        }
+        if (data.status == "success") {
+          jQuery.each(data.playlists,
+          function(i, row) {
+            // console.log(data);
+            $("#myplaylists").append("<tr><td class=\"collapsing\"><div class=\"ui fitted slider checkbox\" id='" +row.plid+ "'><input type=\"checkbox\"><label></label></div></td><td>" + row.title + "</td><td>" + row.time + "</td><td>" + row.count + "</td></tr>");
+          });
+        }
+        var tracksId=JSON.parse(localStorage.getItem('tracksId'));
+        $("#addbutton").click(function() {
+          $("#myplaylists").append("<tr><td class=\"collapsing\"><div class=\"ui fitted slider checkbox\" id='new'><input type=\"checkbox\"><label></label></div></td><td><div class=\"ui mini input\"><input type=\"text\" placeholder=\"Playlist Name\" id='plname'><div>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</div></div><button class='mini green ui button' id='addconfirm'>Add</button></td><td></td><td></td></tr>");
+          $("#addconfirm").click(function() {
+          $("#confirmbutton").addClass('disabled');
+          $(this).addClass('loading');
+          $.ajax({
+            type: 'post',
+             url: '/api/addplaylist/',
+            data: { plname : $('#plname').val() },
+            success: function(data) {
+              if (data.status == "error") {
+                  $('.ui .message').text(data.error);
+                  $('.ui .message').removeClass("hidden");
+                  $('.ui .detailbutton').removeClass("loading");
+                  $('.ui .detailbutton').removeClass("disabled");
+                }
+              if (data.status == "success") {
+                location.reload();
+              }
+      }
+    });
+        });
+        });
+        $("#confirmbutton").click(function() {
+            var plidList = [];
+            $('.ui.checkbox').each(function() {
+              if($(this).checkbox('is checked')) {
+                console.log($(this).attr('id'));
+                plidList.push($(this).attr('id'));
+              }
+            });
+            if(plidList.length != 0 && tracksId.length != 0) {
+              $.ajax({
+            type: 'post',
+             url: '/api/addintoplaylist/',
+            data: {data : JSON.stringify({ plidList : plidList, tracksId : tracksId })},
+            success: function(data) {
+              if (data.status == "error") {
+                  $('.ui .message').text(data.error);
+                  $('.ui .message').removeClass("hidden");
+                  $('.ui .detailbutton').removeClass("loading");
+                  $('.ui .detailbutton').removeClass("disabled");
+                }
+              if (data.status == "success") {
+                window.location.href = '/me/';
+              }
+      }
+    });
+            }
+          });
+      }
+    });
+    })
+  </script>
+</html>

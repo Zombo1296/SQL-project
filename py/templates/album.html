@@ -23,18 +23,30 @@
         <table class="ui selectable compact celled table raised segment center aligned" id="tracktable">
           <thead>
             <tr>
+              <th></th>
               <th>Play</th>
               <th>Track Name</th>
               <th>Artist</th>
               <th>Duration</th>
               <th>Rating</th></tr>
           </thead>
-          <tbody></table>
+          <tbody>
+                <tfoot class="full-width">
+                        <tr>
+                          <th colspan="6">
+                            <div class="ui left floated small violet labeled icon button" id="addbutton">
+                              <i class="add icon"></i> Add Playlist
+                            </div>
+                          </th>
+                        </tr>
+                      </tfoot>
+          </table>
         <div class="ui negative message hidden"></div>
       </div>
     </div>
   </body>
   <script>$(document).ready(function() {
+      localStorage.removeItem('tracksId');
       $.ajax({
         type: 'get',
         url: '/api/getAlbum/',
@@ -55,7 +67,7 @@
             function(i, row) {
               $("#albumName").text("Album-" + data.title);
               $("#albumDate").text("Released on " + data.time);
-              $("#tracktable").append("<tr><td><button class=\"ui violet circular play icon button playbutton\" value=\"" + row.tid + "\"><i class=\"play icon\"></i></button>" + "</td><td>" + row.title + "</td><td>" + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000) + "</td>" + "<td><form class=\"ui form ratingForm\"><div class=\"ui star rating\" name=\"rate\" data-rating = \"" + row.rating + "\"" + "></div><input type=\"hidden\" name=\"trackID\" value=\"" + row.tid + "\"></form></td>" + "</tr>");
+              $("#tracktable").append("<tr><td class=\"collapsing\"><div class=\"ui fitted slider checkbox\" id='" +row.tid+ "'><input type=\"checkbox\"> <label></label></div></td> <td><button class=\"ui violet circular play icon button playbutton\" value=\"" + row.tid + "\"><i class=\"play icon\"></i></button>" + "</td><td>" + row.title + "</td><td>" + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000) + "</td>" + "<td><form class=\"ui form ratingForm\"><div class=\"ui star rating\" name=\"rate\" data-rating = \"" + row.rating + "\"" + "></div><input type=\"hidden\" name=\"trackID\" value=\"" + row.tid + "\"></form></td>" + "</tr>");
             
               $('.ui .ratingForm').form();
 
@@ -87,6 +99,19 @@
             });
             $(".playbutton").click(function() {
               window.open('/play/' + $(this).val(), 'Play', 'height=400,width=320,top=100,status=no,toolbar=no,menubar=no,location=no,resizable=no,scrollbars=0,titlebar=no');
+            });
+            $("#addbutton").click(function() {
+              var idList = [];
+              $('.ui.checkbox').each(function() {
+                if($(this).checkbox('is checked')) {
+                  console.log($(this).attr('id'));
+                  idList.push($(this).attr('id'));
+                }
+              });
+              localStorage.setItem('tracksId', JSON.stringify(idList));
+              if(idList.length != 0) {
+                window.location.href = "/addplaylist/";
+              }
             });
           }
         }

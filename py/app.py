@@ -62,6 +62,9 @@ def user(name):
 def play(id):
     return render_template('play.html', id=id)
 
+@app.route('/addplaylist/')
+def add_playlist():
+    return app.send_static_file('addplaylist.html')
 
 
 @app.route('/api/insert_update_rating/', methods=['POST'])
@@ -482,6 +485,57 @@ def api_un_follow():
     t = {'status': 'success'}
     return Response(json.dumps(t), mimetype='application/json')
 
+
+@app.route('/api/addplaylist/', methods=['POST'])
+def api_add_playlist():
+    plname = request.form.get('plname')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (plname == None or len(plname) > 45):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''INSERT INTO Playlist(title, by_uid) SELECT %s, uid FROM User WHERE uname = %s; ''', (plname, username))
+    cur.execute("COMMIT;");
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/addintoplaylist/', methods=['POST'])
+def api_add_into_playlist():
+    data = request.form.get('data')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (data == None):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    data = json.loads(data)
+    tupleStr = ''
+    for plid in data['plidList']:
+        for tracksId in data['tracksId']:
+            tupleStr += "('"
+            tupleStr += str(plid)
+            tupleStr += "', '"
+            tupleStr += str(tracksId)
+            tupleStr += "'),"
+    tupleStr = tupleStr[: -1]
+    print (data)
+    print (tupleStr)
+    conn = mysql.connect()
+    cur = conn.cursor()
+    query = "INSERT IGNORE INTO PlaylistTrack(plid, tid) VALUES " + tupleStr
+    cur.execute(query)
+    cur.execute("COMMIT;")
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
