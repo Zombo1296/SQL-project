@@ -86,6 +86,15 @@
 
             });
             $(".playbutton").click(function() {
+              $.ajax({
+                    type: 'post',
+                    url: '/api/addplay/',
+                    data: {
+                      tid: $(this).val(),
+                      plid: '{{ id }}'
+                    },
+                    
+                    }); //ajax ends
               window.open('/play/' + $(this).val(), 'Play', 'height=400,width=320,top=100,status=no,toolbar=no,menubar=no,location=no,resizable=no,scrollbars=0,titlebar=no');
             });
             $("#addbutton").click(function() {

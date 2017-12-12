@@ -704,6 +704,32 @@ def api_un_like():
     t = {'status': 'success'}
     return Response(json.dumps(t), mimetype='application/json')
 
+@app.route('/api/addplay/', methods=['POST'])
+def api_add_play():
+    tid = request.form.get('tid')
+    plid = request.form.get('plid')
+    username = session.get('username', None)
+    print (tid)
+    print (plid)
+    print (username)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (tid == None or plid == None):
+        t = {'status': 'error', 'error': 'Invalid input'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''INSERT INTO PlayHistory(uid, tid)
+                    SELECT uid, %s FROM User WHERE uname = %s; ''', (tid, username))
+    cur.execute("COMMIT;");
+    cur.execute('''UPDATE Playlist SET count = count + 1 WHERE plid = %s ''', (plid))
+    cur.execute("COMMIT;");
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
