@@ -355,7 +355,7 @@ def api_search():
 
         trackList = []
         for row in tracks:
-            trackList.append({'title': row[0], 'description': row[1], 'album': row[2]})
+            trackList.append({'title': row[0], 'description': row[1], 'url': '/album/' + row[2]})
         category1 = {'name': "Tracks", 'results' : trackList}
 
         artistList = []
@@ -365,7 +365,7 @@ def api_search():
 
         albumList = []
         for row in albums:
-            albumList.append({'title': row[0], 'aid': row[1]})
+            albumList.append({'title': row[0], 'alid': row[1], 'url' : '/album/' + row[1]})
         category3 = {'name': "Albums", 'results': albumList}
 
         userList = []
