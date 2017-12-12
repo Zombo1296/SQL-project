@@ -6,4 +6,3 @@ py/Include/*
 py/config.py
 py/flask_session/*
 py/py/*
-py/bin/*
