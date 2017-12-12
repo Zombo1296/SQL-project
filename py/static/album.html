@@ -60,7 +60,8 @@
 	
 	<script>
 		$(document)
-			.ready(function() {
+			.ready(function(){
+
 
                 $.ajax({
         				type: 'get',
@@ -83,12 +84,37 @@
                                     $("#albumDate").text("Released on "+data.time);
                                     $("#tracktable").append("<tr><td>" + row.title + "</td><td>"
                                     + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000)
-                                    + "</td><td><div class=\"ui star rating\" data-rating=\""+row.rating+"\" value = \""+row.tid+"\"></div></td></tr>");
+                                    + "</td>"   
+                                    +"<td><form class=\"ui form ratingForm\"><div class=\"ui star rating\" name=\"rate\" data-rating = \""+row.rating+"\""
+                                    +"></div><input type=\"hidden\" name=\"trackID\" value=\""+row.tid+"\"></form></td>"
+                                    +"</tr>");
+
+                                      
+                                    $('.ui .ratingForm').form();
                                     
                                     $('.ui.rating').rating({
                                         maxRating: 5,
                                         onRate: function (rating) {
-                                            console.log(rating);
+                                            var myform = $('.ui .ratingForm');
+                                            $.ajax({
+                                                type: 'post',
+                                                url: '/api/insert_update_rating/',
+                                                data: myform.serialize(),
+                                                success: function(data) {
+                                                    if(data.status=="error") {
+                                                    console.log(data);
+                                
+                                                    }
+                                                    if(data.status=="success"){
+                                                        console.log(data);
+                                                    }
+                                                },
+                                            }); //ajax ends
+
+                                       
+                                            
+                                            
+                                            
                                         }
                                     });
                                 
@@ -99,51 +125,7 @@
                 });
 
 
-                //this click event is not being used
-                $(".likebutton").click(function() {
-                    $('.ui .message').addClass("hidden");
-                    $(".likebutton").addClass("disabled");
-                    $(this).addClass("loading");
-                    $.ajax({
-        				type: 'post',
-						url: 'insert.php',
-						data: {
-                            userid: userid,
-                            rsvptime: rsvptime,
-                            numguests: numguests,
-                            rid: $(this).val()
-                        },
-						success: function(data) {
-							if(data.status=="error") {
-                                $('.ui .message').text(data.error);
-								$('.ui .message').removeClass("hidden");
-								$('.ui .likebutton').removeClass("loading");
-                                $('.ui .likebutton').removeClass("disabled");
-                            }
-							if(data.status=="success"){
-                                $.ajax({
-                                    type: 'post',
-						            url: 'booking.php',
-                                    data: {
-                                        userid: userid
-                                    },
-                                    success: function(data) {
-                                        if(data.status=="error") {
-                                            $('.ui .message').text(data.error);
-								            $('.ui .message').removeClass("hidden");
-								            $('.ui .likebutton').removeClass("loading");
-                                            $('.ui .likebutton').removeClass("disabled");
-                                        }
-                                        else{
-                                            sessionStorage.setItem('booking', JSON.stringify(data.result));
-                                            window.location.href = "booking.html";
-                                        }
-                                    }
-                                });
-							}
-						},
-					});
-                });
+                
 
             });
 	</script>

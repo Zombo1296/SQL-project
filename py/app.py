@@ -60,6 +60,44 @@ def user(name):
 
 
 
+@app.route('/api/insert_update_rating/', methods=['POST'])
+def api_insert_update_rating():
+    rating = request.form.get('rate')
+    # will have user ID here
+    tID = request.form.get('trackID')
+    
+    print (rating)
+    print (tID)
+
+    if(rating == None or tID == None):
+        t = {'status': 'error', 'error': 'Invalid input'}
+        return Response(json.dumps(t), mimetype='application/json')
+
+    conn = mysql.connect()
+    cur = conn.cursor()
+    # cur.execute("SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+    # cur.execute("START TRANSACTION")
+    # cur.execute('''SELECT tid FROM `Rating` WHERE tid = %s''', (tid))
+    # rv = cur.fetchone()
+    # if rv == None:
+    cur.execute(''' INSERT INTO `Rating` (uid, tid, rate) VALUES 
+                    (2, %s, %d) 
+                    ON DUPLICATE KEY 
+                    UPDATE rate = VALUES(rate), time = VALUES(time)''' ,
+                (tID,rating))
+    # conn.commit()
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+# else:
+    
+#     cur.close()
+#     conn.rollback()
+#     conn.close()
+#     t = {'status': 'error', 'error': 'Username already exists.'}
+#     return Response(json.dumps(t), mimetype='application/json')
+
 
 @app.route('/api/addUser/', methods=['POST'])
 def api_add_user():
