@@ -80,7 +80,7 @@
           </div>
           <div class="row">
             <div class="center aligned column">
-              <a class="ui huge inverted violet button">Check Them Out</a>
+              <a class="ui huge inverted violet button" id="checkOut">Check Them Out</a>
             </div>
           </div>
         </div>
@@ -144,15 +144,15 @@
                 Services
               </h4>
               <div class="ui inverted link list">
-                <a class="item" href="homepage.html#"> Banana Pre-Order</a><a class="item" href="homepage.html#"> DNA FAQ</a>
+                <a class="item" href="homepage.html#">order stuff</a><a class="item" href="homepage.html#"> bb music FAQ</a>
               </div>
             </div>
             <div class="seven wide column">
               <h4 class="ui inverted header">
-                Footer Header
+                Join us now!!!
               </h4>
               <p>
-                Extra space for a call to action inside the footer that could help re-engage users.
+                We provide the best music searching service in the world.
               </p>
             </div>
           </div>
@@ -166,7 +166,7 @@
       }
       
       .masthead.segment {
-        min-height: 900px;
+        min-height: 1100px;
         padding: 1em 0em;
         background-image: url('./image/background.png') !important;
         background-size: cover !important;
@@ -292,6 +292,10 @@
     $('#login').click(function(){
       window.location.href = "/login/";
 		});
+
+    $('#checkOut').click(function(){
+      window.location.href = "/login/";
+    });
 
     $('.album_link').click(function(){
       window.location.href = "/album/"; //album id
