@@ -43,7 +43,9 @@
             
             <table class="ui selectable celled table raised segment center aligned" id="tracktable">
                     <thead>
-                      <tr><th>Track Name</th>
+                      <tr>
+		      <th>Play</th>
+		      <th>Track Name</th>
                       <th>Artist</th>
                       <th>Duration</th>
                       <th>Rating</th>
@@ -82,7 +84,8 @@
                                 jQuery.each(data.tracks, function(i, row) {
                                     $("#albumName").text("Album-"+data.title);
                                     $("#albumDate").text("Released on "+data.time);
-                                    $("#tracktable").append("<tr><td>" + row.title + "</td><td>"
+                                    $("#tracktable").append("<tr><td><iframe src=\"https://open.spotify.com/embed?uri=spotify:track:"+row.tid+"\"
+        width=\"250\" height=\"80\" frameborder=\"0\" allowtransparency=\"true\"></iframe></td><td>" + row.title + "</td><td>"
                                     + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000)
                                     + "</td>"   
                                     +"<td><form class=\"ui form ratingForm\"><div class=\"ui star rating\" name=\"rate\" data-rating = \""+row.rating+"\""
