@@ -66,6 +66,10 @@ def play(id):
 def add_playlist():
     return app.send_static_file('addplaylist.html')
 
+@app.route('/playlist/<id>')
+def playlist(id):
+    return render_template('playlist.html', id=id)
+
 
 @app.route('/api/insert_update_rating/', methods=['POST'])
 def api_insert_update_rating():
@@ -213,10 +217,10 @@ def api_get_album():
         cur = conn.cursor()
         cur.execute('''SELECT title, time FROM `Album` WHERE alid = %s''', (id))
         albuminfo = cur.fetchone()
-        cur.execute('''SELECT T_R.tid, title, duration, COALESCE(rate,0) AS rate, by_aname 
-                        From Track, 
+        cur.execute('''SELECT T_R.tid, title, duration, COALESCE(rate,0) AS rate, by_aname
+                        From Track,
                             (SELECT T.tid,rate FROM
-                                (SELECT tid 
+                                (SELECT tid
                                     FROM Track WHERE alid = %s) AS T
                                 LEFT JOIN
                                 (SELECT rate,tid
@@ -535,6 +539,46 @@ def api_add_into_playlist():
     cur.close()
     conn.close()
     t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/getPlaylist/', methods=['GET'])
+def api_get_playlist():
+    id = request.args.get('id')
+    print(id)
+    if (id == None):
+        t = {'status': 'error', 'error': 'Invalid id'}
+        return Response(json.dumps(t), mimetype='application/json')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT title, time FROM `Playlist` WHERE plid = %s''', (id))
+        plinfo = cur.fetchone()
+        cur.execute('''SELECT T_R.tid, title, duration, COALESCE(rate,0) AS rate, by_aname
+                        From Track,
+                            (SELECT T.tid, rate FROM
+                                (SELECT tid, plid FROM PlaylistTrack WHERE plid = %s) AS T
+                                LEFT JOIN
+                                (SELECT rate, tid
+                                    FROM Rating, User
+                                    WHERE Rating.uid = User.uid AND uname = %s) AS R
+                            ON T.tid = R.tid) AS T_R
+                        WHERE Track.tid = T_R.tid''',(id, username));
+        tracksinfo = cur.fetchall()
+        cur.close()
+        conn.close()
+        print (tracksinfo)
+        print(plinfo)
+        tracksinfoList = []
+        print (tracksinfoList)
+        for row in tracksinfo:
+            print (row)
+            tracksinfoList.append({'tid' : row[0], 'title' : row[1], 'duration' : row[2], 'rating' : row[3], 'artist': row[4]})
+
+        t = {'status': 'success', 'title': plinfo[0], 'time': str(plinfo[1]), 'tracks' : tracksinfoList}
     return Response(json.dumps(t), mimetype='application/json')
 
 if __name__ == '__main__':

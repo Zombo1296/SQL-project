@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  
+  <head>
+    <link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
+    <script src="/jquery/jquery.min.js"></script>
+    <script src="/jquery/sha1.js"></script>
+    <script src="/semantic-ui/semantic.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Playlist</title>
+    <style type="text/css">body { background-color: #FFFFFF; } body > .grid { height: 100%; } .restaurantcolumn { max-width: 1000px; background-color: #FFFFFF; }</style></head>
+  
+  <body>
+    <div class="ui middle aligned center aligned grid">
+      <div class="column restaurantcolumn">
+        <h2 class="ui violet header">
+          <i class="music icon"></i>
+          <div class="content" id="playlistName"></div>
+        </h2>
+        <p>
+          <div class="content" id="playlistDate"></div>
+        </p>
+        <table class="ui selectable compact celled table raised segment center aligned" id="tracktable">
+          <thead>
+            <tr>
+              <th>Play</th>
+              <th>Track Name</th>
+              <th>Artist</th>
+              <th>Duration</th>
+              <th>Rating</th></tr>
+          </thead>
+          <tbody>
+          </table>
+        <div class="ui negative message hidden"></div>
+      </div>
+    </div>
+  </body>
+  <script>$(document).ready(function() {
+      localStorage.removeItem('tracksId');
+      $.ajax({
+        type: 'get',
+        url: '/api/getPlaylist/',
+        data: {
+          id: '{{ id }}'
+        },
+        success: function(data) {
+          if (data.status == "error") {
+            $('.ui .message').text(data.error);
+            $('.ui .message').removeClass("hidden");
+            $('.ui .likebutton').removeClass("loading");
+            $('.ui .likebutton').removeClass("disabled");
+          }
+          if (data.status == "success") {
+            $('#playlistName').text(data.title);
+            $('#playlistDate').text(data.time);
+            jQuery.each(data.tracks,
+            function(i, row) {
+              $("#tracktable").append("<tr></td> <td><button class=\"ui violet circular play icon button playbutton\" value=\"" + row.tid + "\"><i class=\"play icon\"></i></button>" + "</td><td>" + row.title + "</td><td>" + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000) + "</td>" + "<td><form class=\"ui form ratingForm\"><div class=\"ui star rating\" name=\"rate\" data-rating = \"" + row.rating + "\"" + "></div><input type=\"hidden\" name=\"trackID\" value=\"" + row.tid + "\"></form></td>" + "</tr>");
+            
+              $('.ui .ratingForm').form();
+
+              $('.ui.rating').rating({
+                maxRating: 5,
+                onRate: function(rating) {
+                  var tid = $(this).next().val();
+                  $.ajax({
+                    type: 'post',
+                    url: '/api/insert_update_rating/',
+                    data: {
+                      tid: tid,
+                      rating: rating
+                    },
+                    success: function(data) {
+                      if (data.status == "error") {
+                        console.log(data);
+
+                      }
+                      if (data.status == "success") {
+                        console.log(data);
+                      }
+                    },
+                  }); //ajax ends
+
+                }
+              });
+
+            });
+            $(".playbutton").click(function() {
+              window.open('/play/' + $(this).val(), 'Play', 'height=400,width=320,top=100,status=no,toolbar=no,menubar=no,location=no,resizable=no,scrollbars=0,titlebar=no');
+            });
+            $("#addbutton").click(function() {
+              var idList = [];
+              $('.ui.checkbox').each(function() {
+                if($(this).checkbox('is checked')) {
+                  console.log($(this).attr('id'));
+                  idList.push($(this).attr('id'));
+                }
+              });
+              localStorage.setItem('tracksId', JSON.stringify(idList));
+              if(idList.length != 0) {
+                window.location.href = "/addplaylist/";
+              }
+            });
+          }
+        }
+      });
+    });</script>
+
+</html>
