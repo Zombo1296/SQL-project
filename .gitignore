@@ -5,3 +5,4 @@ py/tcl/*
 py/Include/*
 py/config.py
 py/flask_session/*
+py/py/*
