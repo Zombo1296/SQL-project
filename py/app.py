@@ -193,32 +193,29 @@ def api_logout():
 @app.route('/api/getAlbum/', methods=['GET'])
 def api_get_album():
     id = request.args.get('id')
-    if(len(id) != 22):
+    if (len(id) != 22):
         t = {'status': 'error', 'error': 'Invalid id'}
+        return Response(json.dumps(t), mimetype='application/json')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
     else:
         conn = mysql.connect()
         cur = conn.cursor()
         cur.execute('''SELECT title, time FROM `Album` WHERE alid = %s''', (id))
         albuminfo = cur.fetchone()
-
-
-        #cur.execute('''SELECT tid, title, duration, by_aname FROM `Track` WHERE alid = %s''', (id))
         cur.execute('''SELECT T_R.tid, title, duration, COALESCE(rate,0) AS rate, by_aname 
                         From Track, 
                             (SELECT T.tid,rate FROM
-
                                 (SELECT tid 
-                                    FROM Track WHERE alid = %s) AS T 
-
-                                LEFT JOIN 
-
-                                (SELECT rate,tid 
-                                    FROM Rating 
-                                    WHERE uid = '2') AS R
-
-                            ON R.tid = T.tid) AS T_R 
-
-                        WHERE Track.tid = T_R.tid''',(id)); 
+                                    FROM Track WHERE alid = %s) AS T
+                                LEFT JOIN
+                                (SELECT rate,tid
+                                    FROM Rating, User
+                                    WHERE Rating.uid = User.uid AND uname = %s) AS R
+                            ON R.tid = T.tid) AS T_R
+                        WHERE Track.tid = T_R.tid''',(id, username));
 
         tracksinfo = cur.fetchall()
         cur.close()
