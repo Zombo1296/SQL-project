@@ -72,6 +72,9 @@
               $("#albums").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td><button class='ui violet button playlistbutton' value=" + row.alid + ">Detail</button></td></tr>");
             });
           }
+          $('.playlistbutton').click(function() {
+            window.location.href = "/album/" + $(this).val();
+          });
         }
       });
       $.ajax({

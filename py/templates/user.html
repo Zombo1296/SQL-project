@@ -73,6 +73,9 @@
               $("#playlists").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td>" + row.count + "</td><td><button class='ui violet button playlistbutton' value=" + row.plid + ">Detail</button></td></tr>");
             });
           }
+          $('.playlistbutton').click(function() {
+            window.location.href = "/playlist/" + $(this).val();
+          });
         }
       });
       $.ajax({
