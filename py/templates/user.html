@@ -24,7 +24,10 @@
               <a class="header" id="username">Kristy</a>
               <div class="meta">
                 <span class="description" id="nickname">Joined in 2017</span></div>
-              <div class="description" id="city">Living in New York.</div></div>
+              <div class="description" id="city">Living in New York.</div>
+              <div class="meta">&nbsp</div>
+              <button class="ui violet button" id="follow">Follow</button></div>
+              
               <div class="extra content">
                   <a>
                     <i class="user icon"></i><i id="followers">22 Followers</i></a>
@@ -85,51 +88,55 @@
           }
         }
       });
-
-
-
-      $(".detailbutton").click(function() {
-        $('.ui .message').addClass("hidden");
-        $(".detailbutton").addClass("disabled");
-        $(this).addClass("loading");
-        $.ajax({
-          type: 'post',
-          url: 'insert.php',
-          data: {
-            userid: userid,
-            rsvptime: rsvptime,
-            numguests: numguests,
-            rid: $(this).val()
-          },
-          success: function(data) {
-            if (data.status == "error") {
-              $('.ui .message').text(data.error);
-              $('.ui .message').removeClass("hidden");
-              $('.ui .detailbutton').removeClass("loading");
-              $('.ui .detailbutton').removeClass("disabled");
+      $.ajax({
+        type: 'get',
+        url: '/api/getfollowstatus/',
+        data: {username : '{{ name }}' },
+        success: function(data) {
+          if (data.status == "error") {
+          }
+          if (data.status == "success") {
+            if(data.followstatus == 0) {
+              $('#follow').text('Follow');
+              $('#follow').addClass('violet');
+              $('#follow').removeClass('loading');
             }
-            if (data.status == "success") {
-              $.ajax({
-                type: 'post',
-                url: 'booking.php',
-                data: {
-                  userid: userid
-                },
-                success: function(data) {
-                  if (data.status == "error") {
-                    $('.ui .message').text(data.error);
-                    $('.ui .message').removeClass("hidden");
-                    $('.ui .detailbutton').removeClass("loading");
-                    $('.ui .detailbutton').removeClass("disabled");
-                  } else {
-                    sessionStorage.setItem('booking', JSON.stringify(data.result));
-                    window.location.href = "booking.html";
-                  }
-                }
-              });
+            if(data.followstatus == 1) {
+              $('#follow').text('Following');
+              $('#follow').removeClass('violet');
+              $('#follow').removeClass('loading');
             }
-          },
-        });
+          }
+        }
+      });
+      $("#follow").click(function(event) {
+        console.log('haha');
+        //$("#follow").addClass("loading");
+        console.log($("#follow").text());
+        if($("#follow").text() == "Following") {
+          $.ajax({
+        type: 'get',
+        url: '/api/follow/',
+        data: {username : '{{ name }}' },
+        success: function(data) {
+          if (data.status == "error") {
+          }
+          if (data.status == "success") {
+            if(data.followstatus == 0) {
+              $('#follow').text('Follow');
+              $('#follow').addClass('violet');
+            }
+            if(data.followstatus == 1) {
+              $('#follow').text('Following');
+              $('#follow').removeClass('violet');
+            }
+          }
+        }
+      });
+        } else {
+
+        }
+        
       });
     });
     

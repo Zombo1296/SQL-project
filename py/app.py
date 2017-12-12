@@ -295,6 +295,10 @@ def api_search():
                         AGAINST (%s IN BOOLEAN MODE) DESC
                         LIMIT 3;''', (q + '*', q + '*'))
         artists = cur.fetchall()
+
+        cur.execute('''SELECT uname, nickname FROM User WHERE uname LIKE %s LIMIT 5''', (q + '%'))
+        users = cur.fetchall()
+
         cur.close()
         conn.close()
 
@@ -312,7 +316,13 @@ def api_search():
         for row in albums:
             albumList.append({'title': row[0], 'aid': row[1]})
         category3 = {'name': "Albums", 'results': albumList}
-        results = {'category1': category1, 'category2': category2, 'category3': category3}
+
+        userList = []
+        for row in users:
+            userList.append({'title': row[0], 'description': row[1], 'url' : '/user/' + row[0]})
+        category4 = {'name': "Users", 'results': userList}
+
+        results = {'category1': category1, 'category2': category2, 'category3': category3, 'category4': category4}
         t = {'status': 'success', 'results': results}
     return Response(json.dumps(t), mimetype='application/json')
 
@@ -348,19 +358,41 @@ def api_get_user():
         return Response(json.dumps(t), mimetype='application/json')
     if (uname == None or len(uname) > 45):
         uname = username
-        conn = mysql.connect()
-        cur = conn.cursor()
-        cur.execute('''SELECT uname, nickname, email, city FROM User WHERE uname = %s;''', (uname))
-        user = cur.fetchone()
-        cur.execute('''SELECT COUNT(*) FROM `Follow`, User WHERE User.uid = Follow.f_uid AND uname = %s;''', (uname))
-        count = cur.fetchone()
-        cur.close()
-        conn.close()
-        if user == None:
-            t = {'status': 'error', 'error': "No such user"}
-        else:
-            t = {'status': 'success', 'username': user[0], 'nickname': user[1], 'email' : user[2], 'city' : user[3],
-                 'followers' : count[0]}
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''SELECT uname, nickname, email, city FROM User WHERE uname = %s;''', (uname))
+    user = cur.fetchone()
+    cur.execute('''SELECT COUNT(*) FROM `Follow`, User WHERE User.uid = Follow.f_uid AND uname = %s;''', (uname))
+    count = cur.fetchone()
+    cur.close()
+    conn.close()
+    if user == None:
+        t = {'status': 'error', 'error': "No such user"}
+    else:
+        t = {'status': 'success', 'username': user[0], 'nickname': user[1], 'email' : user[2], 'city' : user[3],
+             'followers' : count[0]}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/getfollowstatus/', methods=['GET'])
+def api_get_follow_status():
+    uname = request.args.get('username')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (uname == None or len(uname) > 45):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''SELECT COUNT(Follow.uid) FROM Follow, User u1, User u2
+                    WHERE Follow.uid = u1.uid AND Follow.f_uid = u2.uid AND
+                    u1.uname = %s AND u2.uname = %s; ''', (username, uname))
+    followcount = cur.fetchone()
+    cur.close()
+    conn.close()
+    t = {'status': 'success', 'followstatus': followcount[0]}
+
     return Response(json.dumps(t), mimetype='application/json')
 
 
