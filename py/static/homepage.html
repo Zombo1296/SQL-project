@@ -19,7 +19,7 @@
 
     <!--Sidebar Menu-->
     <div class="ui vertical inverted sidebar menu">
-      <a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a><a class="item">Login</a><a class="item">Signup</a>
+      <a class="active item home_link" >Home</a><a class="item album_link" >Album</a><a class="item artist_link">Artist</a><a class="item playlist_link">Playlist</a><a class="item">Login</a><a class="item">Signup</a>
     </div>
 
     <!--Page Contents-->
@@ -29,7 +29,7 @@
         <!-- top bar menu -->
         <div class="ui container">
           <div class="ui large secondary inverted pointing menu">
-            <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">Home</a><a class="item">Album</a><a class="item">Artist</a><a class="item">Playlist</a>
+            <a class="toc item"><i class="sidebar icon"></i></a><a class="active item home_link" >Home</a><a class="item album_link" >Album</a><a class="item artist_link">Artist</a><a class="item playlist_link">Playlist</a>
             <div class="right item">
               <a class="ui inverted button" id="login">Log in</a><a class="ui inverted button signup">Sign Up</a>
             </div>
@@ -292,6 +292,43 @@
     $('#login').click(function(){
       window.location.href = "/login/";
 		});
+
+    $('.album_link').click(function(){
+      window.location.href = "/album/"; //album id
+    });
+
+    $( ".album_link" )
+      .mouseout(function() {
+        
+        $( this ).removeClass( "active" );
+        $(".home_link").addClass( "active" );
+      })
+      .mouseover(function() {
+        $( this ).addClass("active");
+        $(".home_link").removeClass( "active" );
+      });
+
+    $( ".artist_link" )
+      .mouseout(function() {
+        
+        $( this ).removeClass( "active" );
+        $(".home_link").addClass( "active" );
+      })
+      .mouseover(function() {
+        $( this ).addClass("active");
+        $(".home_link").removeClass( "active" );
+      });
+
+    $( ".playlist_link" )
+      .mouseout(function() {
+        
+        $( this ).removeClass( "active" );
+        $(".home_link").addClass( "active" );
+      })
+      .mouseover(function() {
+        $( this ).addClass("active");
+        $(".home_link").removeClass( "active" );
+      });
     </script>
   </body>
 </html>

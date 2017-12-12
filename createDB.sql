@@ -24,7 +24,7 @@ CREATE TABLE `User` (
   `uname` varchar(45) NOT NULL,
   `nickname` varchar(45) DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
-  `password` varchar(10) NOT NULL,
+  `password` var(40) NOT NULL,
   `city` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`uid`),
   UNIQUE KEY `uname` (`uname`),
