@@ -58,6 +58,10 @@ def album(id):
 def user(name):
     return render_template('user.html', name=name)
 
+@app.route('/play/<id>')
+def play(id):
+    return render_template('play.html', id=id)
+
 
 
 @app.route('/api/insert_update_rating/', methods=['POST'])
@@ -221,8 +225,12 @@ def api_get_album():
         tracksinfo = cur.fetchall()
         cur.close()
         conn.close()
+        print (tracksinfo)
+        print(albuminfo)
         tracksinfoList = []
+        print (tracksinfoList)
         for row in tracksinfo:
+            print (row)
             tracksinfoList.append({'tid' : row[0], 'title' : row[1], 'duration' : row[2], 'rating' : row[3], 'artist': row[4]})
 
         t = {'status': 'success', 'title': albuminfo[0], 'time': str(albuminfo[1]), 'tracks' : tracksinfoList}
