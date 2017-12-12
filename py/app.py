@@ -234,6 +234,8 @@ def api_get_album():
                         WHERE Track.tid = T_R.tid''',(id, username));
 
         tracksinfo = cur.fetchall()
+        if(albuminfo == None):
+            albuminfo=('Album', '2017')
         cur.close()
         conn.close()
         print (tracksinfo)
@@ -256,10 +258,11 @@ def api_get_new_tracks():
     else:
         conn = mysql.connect()
         cur = conn.cursor()
-        cur.execute('''SELECT tid, title, duration, aname, alid FROM Track, Likes, User
+        cur.execute('''SELECT tid, Track.title, duration, aname, Track.alid FROM Track, Likes, User
                             WHERE Track.by_aname = Likes.aname
                             AND Likes.uid = User.uid
                             AND User.uname = %s
+                            ORDER BY Likes.time DESC
                             LIMIT 7;''', (username))
         tracksinfo = cur.fetchall()
         cur.close()
