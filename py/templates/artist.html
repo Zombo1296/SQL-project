@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  
+  <head>
+    <link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
+    <script src="/jquery/jquery.min.js"></script>
+    <script src="/jquery/sha1.js"></script>
+    <script src="/semantic-ui/semantic.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Artist  {{ id }}</title>
+    <style type="text/css">body { background-color: #FFFFFF; } body > .grid { top: 50%; } .trackcolumn { max-width: 800px; background-color: #FFFFFF; }</style></head>
+  
+  <body>
+    <div class="ui middle aligned center aligned column grid">
+      <div class="row"></div>
+      <div class="row"></div>
+      <div class="row"></div>
+      <div class="row">
+        <div class="ui three wide column">
+          <div class="ui card">
+            <div class="image">
+              <img src="/image/avatar/avatar.png"></div>
+            <div class="content">
+              <a class="header" id="aname">{{ id }}</a>
+              <div class="meta">
+                <span class="description" id="nickname">Joined in 2017</span></div>
+              <div class="description" id="city">Living in New York.</div>
+              <div class="meta">&nbsp</div>
+              <button class="ui violet button" id="follow">Like</button></div>
+            <div class="extra content">
+              <a>
+                <i class="user icon"></i>
+                <i id="followers">22 Fans</i></a>
+            </div>
+          </div>
+        </div>
+        <div class="fifteen wide column trackcolumn">
+          <h3 class="ui violet header">
+            <i class="music icon"></i>
+            <div class="content">Albums</div></h3>
+          <table class="ui selectable celled compact table raised segment center aligned" id="albums">
+            <thead>
+              <tr>
+                <th>Album Name</th>
+                <th>Created on</th>
+                <th>Detail</th></tr>
+            </thead>
+            <tbody></table>
+          <div class="ui negative message hidden"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>$(document).ready(function() {
+      $.ajax({
+        type: 'get',
+        url: '/api/getartistalbums/',
+        data: {
+          artistname: '{{ id }}'
+        },
+        success: function(data) {
+          if (data.status == "error") {
+            $('.ui .message').text(data.error);
+            $('.ui .message').removeClass("hidden");
+            $('.ui .detailbutton').removeClass("loading");
+            $('.ui .detailbutton').removeClass("disabled");
+          }
+          if (data.status == "success") {
+            jQuery.each(data.albums,
+            function(i, row) {
+              // console.log(data);
+              $("#albums").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td><button class='ui violet button playlistbutton' value=" + row.alid + ">Detail</button></td></tr>");
+            });
+          }
+          $('.playlistbutton').click(function() {
+            window.location.href = "/album/" + $(this).val();
+          });
+        }
+      });
+      $.ajax({
+        type: 'get',
+        url: '/api/getartist/',
+        data: {
+          artistname: '{{ id }}'
+        },
+        success: function(data) {
+          if (data.status == "error") {}
+          if (data.status == "success") {
+            $("#followers").text(data.fans + " fans.");
+          }
+        }
+      });
+      $.ajax({
+        type: 'get',
+        url: '/api/getlikestatus/',
+        data: {
+          artistname: '{{ id }}'
+        },
+        success: function(data) {
+          if (data.status == "error") {}
+          if (data.status == "success") {
+            if (data.followstatus == 0) {
+              $('#follow').text('Like');
+              $('#follow').addClass('violet');
+              $('#follow').removeClass('loading');
+            }
+            if (data.followstatus == 1) {
+              $('#follow').text('Liked');
+              $('#follow').removeClass('violet');
+              $('#follow').removeClass('loading');
+            }
+          }
+        }
+      });
+      $("#follow").click(function(event) {
+        console.log('haha');
+        //$("#follow").addClass("loading");
+        console.log($("#follow").text());
+        if ($("#follow").text() == "Liked") {
+          $.ajax({
+            type: 'post',
+            url: '/api/unlike/',
+            data: {
+              artistname: '{{ id }}'
+            },
+            success: function(data) {
+              if (data.status == "error") {}
+              if (data.status == "success") {
+
+                $('#follow').text('Like');
+                $('#follow').addClass('violet');
+                $.ajax({
+                  type: 'get',
+                  url: '/api/getartist/',
+                  data: {
+                    artistname: '{{ id }}'
+                  },
+                  success: function(data) {
+                    if (data.status == "error") {}
+                    if (data.status == "success") {
+                      $("#followers").text(data.fans + " fans.");
+                    }
+                  }
+                });
+              }
+            }
+          });
+        } else {
+          $.ajax({
+            type: 'post',
+            url: '/api/like/',
+            data: {
+              artistname: '{{ id }}'
+            },
+            success: function(data) {
+              if (data.status == "error") {}
+              if (data.status == "success") {
+
+                $('#follow').text('Liked');
+                $('#follow').removeClass('violet');
+                $.ajax({
+                  type: 'get',
+                  url: '/api/getartist/',
+                  data: {
+                    artistname: '{{ id }}'
+                  },
+                  success: function(data) {
+                    if (data.status == "error") {}
+                    if (data.status == "success") {
+                      $("#followers").text(data.fans + " fans.");
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+
+      });
+    });</script>
+
+</html>

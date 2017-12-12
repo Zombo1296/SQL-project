@@ -106,9 +106,12 @@
             jQuery.each(data.tracks,
             function(i, row) {
               // console.log(data);
-              $("#tracktable").append("<tr><td>" + row.title + "</td><td>" + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000) + "</td><td><button class='ui violet button playlistbutton' value=" + row.tid + ">Detail</button></td></tr>");
+              $("#tracktable").append("<tr><td>" + row.title + "</td><td>" + row.artist + "</td><td>" + parseInt(row.duration / 60000) + ':' + parseInt(row.duration % 60000 / 1000) + "</td><td><button class='ui violet button trackbutton' value=" + row.album + ">Detail</button></td></tr>");
             });
           }
+          $('.trackbutton').click(function() {
+            window.location.href = "/album/" + $(this).val();
+          });
         }
       });
       $.ajax({
@@ -126,9 +129,12 @@
             jQuery.each(data.playlists,
             function(i, row) {
               // console.log(data);
-              $("#relatedplaylists").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td>" + row.count + "</td><td>" + row.uname + "</td><td><button class='ui violet button playlistbutton' value=" + row.plid + ">Detail</button></td></tr>");
+              $("#relatedplaylists").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td>" + row.count + "</td><td>" + row.uname + "</td><td><button class='ui violet button hisplaylistbutton' value=" + row.plid + ">Detail</button></td></tr>");
             });
           }
+          $('.hisplaylistbutton').click(function() {
+            window.location.href = "/playlist/" + $(this).val();
+          });
         }
       });
       $.ajax({
@@ -146,9 +152,12 @@
             jQuery.each(data.playlists,
             function(i, row) {
               // console.log(data);
-              $("#myplaylists").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td>" + row.count + "</td><td><button class='ui violet button playlistbutton' value=" + row.plid + ">Detail</button></td></tr>");
+              $("#myplaylists").append("<tr><td>" + row.title + "</td><td>" + row.time + "</td><td>" + row.count + "</td><td><button class='ui violet button myplaylistbutton' value=" + row.plid + ">Detail</button></td></tr>");
             });
           }
+          $('.myplaylistbutton').click(function() {
+            window.location.href = "/playlist/" + $(this).val();
+          });
         }
       });
       $.ajax({
@@ -165,49 +174,6 @@
             $("#followers").text(data.followers + " followers");
           }
         }
-      });
-      $(".detailbutton").click(function() {
-        $('.ui .message').addClass("hidden");
-        $(".detailbutton").addClass("disabled");
-        $(this).addClass("loading");
-        $.ajax({
-          type: 'post',
-          url: 'insert.php',
-          data: {
-            userid: userid,
-            rsvptime: rsvptime,
-            numguests: numguests,
-            rid: $(this).val()
-          },
-          success: function(data) {
-            if (data.status == "error") {
-              $('.ui .message').text(data.error);
-              $('.ui .message').removeClass("hidden");
-              $('.ui .detailbutton').removeClass("loading");
-              $('.ui .detailbutton').removeClass("disabled");
-            }
-            if (data.status == "success") {
-              $.ajax({
-                type: 'post',
-                url: 'booking.php',
-                data: {
-                  userid: userid
-                },
-                success: function(data) {
-                  if (data.status == "error") {
-                    $('.ui .message').text(data.error);
-                    $('.ui .message').removeClass("hidden");
-                    $('.ui .detailbutton').removeClass("loading");
-                    $('.ui .detailbutton').removeClass("disabled");
-                  } else {
-                    sessionStorage.setItem('booking', JSON.stringify(data.result));
-                    window.location.href = "booking.html";
-                  }
-                }
-              });
-            }
-          },
-        });
       });
     });
 
