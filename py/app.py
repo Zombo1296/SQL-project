@@ -433,6 +433,49 @@ def api_get_follow_status():
 
     return Response(json.dumps(t), mimetype='application/json')
 
+@app.route('/api/follow/', methods=['POST'])
+def api_follow():
+    uname = request.form.get('username')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (uname == None or len(uname) > 45):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''INSERT INTO Follow (uid, f_uid) SELECT u1.uid, u2.uid FROM User u1, User u2
+                    WHERE u1.uname = %s AND u2.uname = %s
+                    ON DUPLICATE KEY
+                    UPDATE time = VALUES(time); ''', (username, uname))
+    cur.execute("COMMIT;");
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/unfollow/', methods=['POST'])
+def api_un_follow():
+    uname = request.form.get('username')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (uname == None or len(uname) > 45):
+        t = {'status': 'error', 'error': 'Invalid uname'}
+        return Response(json.dumps(t), mimetype='application/json')
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute('''DELETE FROM Follow
+                    WHERE uid IN (SELECT uid FROM User WHERE uname = %s)
+                    AND f_uid IN (SELECT uid FROM User WHERE uname = %s); ''', (username, uname))
+    cur.execute("COMMIT;");
+    cur.close()
+    conn.close()
+    t = {'status': 'success'}
+    return Response(json.dumps(t), mimetype='application/json')
+
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)

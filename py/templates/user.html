@@ -27,26 +27,26 @@
               <div class="description" id="city">Living in New York.</div>
               <div class="meta">&nbsp</div>
               <button class="ui violet button" id="follow">Follow</button></div>
-              
-              <div class="extra content">
-                  <a>
-                    <i class="user icon"></i><i id="followers">22 Followers</i></a>
-                </div>
+            <div class="extra content">
+              <a>
+                <i class="user icon"></i>
+                <i id="followers">22 Followers</i></a>
+            </div>
           </div>
         </div>
         <div class="fifteen wide column trackcolumn">
           <h3 class="ui violet header">
             <i class="music icon"></i>
             <div class="content">Playlists</div></h3>
-            <table class="ui selectable celled compact table raised segment center aligned" id="playlists">
-                <thead>
-                  <tr>
-                    <th>Playlist Name</th>
-                    <th>Created on</th>
-                    <th>Play Times</th>
-                    <th>Detail</th></tr>
-                </thead>
-                <tbody></table>
+          <table class="ui selectable celled compact table raised segment center aligned" id="playlists">
+            <thead>
+              <tr>
+                <th>Playlist Name</th>
+                <th>Created on</th>
+                <th>Play Times</th>
+                <th>Detail</th></tr>
+            </thead>
+            <tbody></table>
           <div class="ui negative message hidden"></div>
         </div>
       </div>
@@ -56,7 +56,9 @@
       $.ajax({
         type: 'get',
         url: '/api/getplaylists/',
-        data: {username : '{{ name }}' },
+        data: {
+          username: '{{ name }}'
+        },
         success: function(data) {
           if (data.status == "error") {
             $('.ui .message').text(data.error);
@@ -76,10 +78,11 @@
       $.ajax({
         type: 'get',
         url: '/api/getuser/',
-        data: {username : '{{ name }}' },
+        data: {
+          username: '{{ name }}'
+        },
         success: function(data) {
-          if (data.status == "error") {
-          }
+          if (data.status == "error") {}
           if (data.status == "success") {
             $("#username").text(data.username);
             $("#nickname").text(data.nickname);
@@ -91,17 +94,18 @@
       $.ajax({
         type: 'get',
         url: '/api/getfollowstatus/',
-        data: {username : '{{ name }}' },
+        data: {
+          username: '{{ name }}'
+        },
         success: function(data) {
-          if (data.status == "error") {
-          }
+          if (data.status == "error") {}
           if (data.status == "success") {
-            if(data.followstatus == 0) {
+            if (data.followstatus == 0) {
               $('#follow').text('Follow');
               $('#follow').addClass('violet');
               $('#follow').removeClass('loading');
             }
-            if(data.followstatus == 1) {
+            if (data.followstatus == 1) {
               $('#follow').text('Following');
               $('#follow').removeClass('violet');
               $('#follow').removeClass('loading');
@@ -113,33 +117,73 @@
         console.log('haha');
         //$("#follow").addClass("loading");
         console.log($("#follow").text());
-        if($("#follow").text() == "Following") {
+        if ($("#follow").text() == "Following") {
           $.ajax({
-        type: 'get',
-        url: '/api/follow/',
-        data: {username : '{{ name }}' },
-        success: function(data) {
-          if (data.status == "error") {
-          }
-          if (data.status == "success") {
-            if(data.followstatus == 0) {
-              $('#follow').text('Follow');
-              $('#follow').addClass('violet');
-            }
-            if(data.followstatus == 1) {
-              $('#follow').text('Following');
-              $('#follow').removeClass('violet');
-            }
-          }
-        }
-      });
-        } else {
+            type: 'post',
+            url: '/api/unfollow/',
+            data: {
+              username: '{{ name }}'
+            },
+            success: function(data) {
+              if (data.status == "error") {}
+              if (data.status == "success") {
 
+                $('#follow').text('Follow');
+                $('#follow').addClass('violet');
+                $.ajax({
+                  type: 'get',
+                  url: '/api/getuser/',
+                  data: {
+                    username: '{{ name }}'
+                  },
+                  success: function(data) {
+                    if (data.status == "error") {}
+                    if (data.status == "success") {
+                      $("#username").text(data.username);
+                      $("#nickname").text(data.nickname);
+                      $("#city").val("Living in" + data.city + ".");
+                      $("#followers").text(data.followers + " followers");
+                    }
+                  }
+                });
+              }
+            }
+          });
+        } else {
+          $.ajax({
+            type: 'post',
+            url: '/api/follow/',
+            data: {
+              username: '{{ name }}'
+            },
+            success: function(data) {
+              if (data.status == "error") {}
+              if (data.status == "success") {
+
+                $('#follow').text('Following');
+                $('#follow').removeClass('violet');
+                $.ajax({
+                  type: 'get',
+                  url: '/api/getuser/',
+                  data: {
+                    username: '{{ name }}'
+                  },
+                  success: function(data) {
+                    if (data.status == "error") {}
+                    if (data.status == "success") {
+                      $("#username").text(data.username);
+                      $("#nickname").text(data.nickname);
+                      $("#city").val("Living in" + data.city + ".");
+                      $("#followers").text(data.followers + " followers");
+                    }
+                  }
+                });
+              }
+            }
+          });
         }
-        
+
       });
-    });
-    
-    </script>
+    });</script>
 
 </html>
