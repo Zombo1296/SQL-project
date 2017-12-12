@@ -1,4 +1,4 @@
-#!/Users/bohanzhang/Movies/db-proj2/py/bin/python
+#!/Users/bohanzhang/Movies/github/SQL-project/py/bin/python
 
 import sys
 import getopt
