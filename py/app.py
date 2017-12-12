@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory, Response, session
+from flask import Flask, request, send_from_directory, Response, session, render_template
 from flaskext.mysql import MySQL
 from flask_session import Session
 import hashlib
@@ -52,7 +52,11 @@ def login():
 
 @app.route('/album/')
 def album():
-    return app.send_static_file('album2.html')
+    return app.send_static_file('album.html')
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
 
 
 
@@ -348,6 +352,53 @@ def api_search():
         category3 = {'name': "Albums", 'results': albumList}
         results = {'category1': category1, 'category2': category2, 'category3': category3}
         t = {'status': 'success', 'results': results}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/getplaylists/', methods=['GET'])
+def api_get_playlists():
+    uname = request.args.get('username')
+    if (uname == None or len(uname) > 45):
+        t = {'status': 'error', 'error': 'Invalid username'}
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+    else:
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT plid, title, time, count FROM Playlist, User
+                        WHERE Playlist.by_uid = User.uid
+                        AND uname = %s;''', (uname))
+        playlists = cur.fetchall()
+        cur.close()
+        conn.close()
+        playlistsList = []
+        for row in playlists:
+            playlistsList.append({'plid': row[0], 'title': row[1], 'time': str(row[2]), 'count': row[3]})
+        t = {'status': 'success', 'playlists': playlistsList}
+    return Response(json.dumps(t), mimetype='application/json')
+
+@app.route('/api/getuser/', methods=['GET'])
+def api_get_user():
+    uname = request.args.get('username')
+    username = session.get('username', None)
+    if username == None:
+        t = {'status': 'error', 'error': 'Login'}
+        return Response(json.dumps(t), mimetype='application/json')
+    if (uname == None or len(uname) > 45):
+        uname = username
+        conn = mysql.connect()
+        cur = conn.cursor()
+        cur.execute('''SELECT uname, nickname, email, city FROM User WHERE uname = %s;''', (uname))
+        user = cur.fetchone()
+        cur.execute('''SELECT COUNT(*) FROM `Follow`, User WHERE User.uid = Follow.f_uid AND uname = %s;''', (uname))
+        count = cur.fetchone()
+        cur.close()
+        conn.close()
+        if user == None:
+            t = {'status': 'error', 'error': "No such user"}
+        else:
+            t = {'status': 'success', 'username': user[0], 'nickname': user[1], 'email' : user[2], 'city' : user[3],
+                 'followers' : count[0]}
     return Response(json.dumps(t), mimetype='application/json')
 
 
