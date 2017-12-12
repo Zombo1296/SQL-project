@@ -95,11 +95,11 @@
                                     $('.ui.rating').rating({
                                         maxRating: 5,
                                         onRate: function (rating) {
-                                            var myform = $('.ui .ratingForm');
+                                            var tid = $(this).next().val()
                                             $.ajax({
                                                 type: 'post',
                                                 url: '/api/insert_update_rating/',
-                                                data: myform.serialize(),
+                                                data: {tid : tid, rating : rating},
                                                 success: function(data) {
                                                     if(data.status=="error") {
                                                     console.log(data);
